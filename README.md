@@ -14,11 +14,11 @@ The Acrobot environment is based on Sutton’s work in “Generalization in Rein
 
 
 1. **Motion equation of a two-link planar robot**:
-$
+```math
 \begin{equation}
    M(q)\ddot{q} + C(q, \dot{q})\dot{q} + G(q) = \tau , \text{where}\ q = [q_1, q_2]^T
 \end{equation}
-$
+```
 
 2. **Inertia matrix**:
 $
