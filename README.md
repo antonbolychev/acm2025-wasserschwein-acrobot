@@ -84,7 +84,58 @@ The Acrobot environment is based on Sutton’s work in “Generalization in Rein
 \end{equation}
 ```
 
+8. **Upright equilibrium point**:
 
+```math
+q_1 = \frac{\pi}{2} \ (\text{mod} \ 2\pi), \quad q_2 = 0, \quad \dot{q}_1 = 0, \quad \dot{q}_2 = 0
+```
+
+9. **Lyapunov function candidate**:
+
+```math
+V = \frac{1}{2} (E - E_r)^2 + \frac{1}{2} k_D \dot{q}_2^2 + \frac{1}{2} k_P q_2^2
+```
+
+10. **Energy at upright equilibrium**:
+
+```math
+E_r = E(q, \dot{q}) \big|_{q_1 = \pi/2, \, q_2 = 0, \, \dot{q} = 0} = \beta_1 + \beta_2
+```
+
+11. **Control condition for $`\dot{V} \le 0`$**:
+
+```math
+(E - E_r) \tau_2 + k_D \ddot{q}_2 + k_P q_2 = -k_V \dot{q}_2
+```
+
+12. **Time derivative of $`V`$**:
+
+```math
+\dot{V} = -k_V \dot{q}_2^2 \leq 0
+```
+
+13. **Solvability condition for $`\tau_2`$**:
+
+```math
+\left( k_D + \frac{(E - E_r) \Delta}{M_{11}} \right) \tau_2 = \frac{(k_V \dot{q}_2 + k_P q_2) \Delta + k_D \big( M_{21}(H_1 + G_1) - M_{11}(H_2 + G_2) \big)}{M_{11}}
+```
+
+14. **Positive definiteness of $`\Delta`$**:
+
+```math
+\Delta = M_{11} M_{22} - M_{12} M_{21} = \alpha_1 \alpha_2 - \alpha_3^2 \cos^2 q_2 > 0
+```
+
+15. **Non-singularity condition**:
+
+```math
+k_D + \frac{(E - E_r) \Delta}{M_{11}} \neq 0 \quad \forall t \geq 0
+```
+
+16. **Final control law for $`\tau_2`$**:
+```math
+\tau_2 = \frac{(k_V \dot{q}_2 + k_P q_2) \Delta + k_D \big( M_{21}(H_1 + G_1) - M_{11}(H_2 + G_2) \big)}{k_D M_{11} + (E - E_r) \Delta}
+```
 
 # User Guide
 
