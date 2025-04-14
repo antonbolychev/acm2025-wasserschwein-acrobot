@@ -1,3 +1,7 @@
+# Acrobot
+
+# User Guide
+
 ## Install
 
 If you don't have uv install
