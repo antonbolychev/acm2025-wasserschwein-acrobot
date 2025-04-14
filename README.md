@@ -21,7 +21,7 @@ The Acrobot environment is based on Sutton’s work in “Generalization in Rein
 ```
 
 2. **Inertia matrix**:
-$
+```math
 \begin{equation}
    M(q) = \begin{bmatrix} 
    M_{11} & M_{12} \\ 
@@ -31,10 +31,10 @@ $
    \alpha_2 + \alpha_3 \cos q_2 & \alpha_2 
    \end{bmatrix}
    \end{equation}
-$
+```
 
 3. **Coriolis and centrifugal terms**:
-$
+```math
 \begin{equation}
    C(q, \dot{q})\dot{q} = \begin{bmatrix} 
    H_1 \\ 
@@ -44,10 +44,10 @@ $
    \dot{q}_1^2 
    \end{bmatrix} \sin q_2
    \end{equation}
-$
+```
 
 4. **Gravitational terms**:
-$
+```math
 \begin{equation}
    G(q) = \begin{bmatrix} 
    G_1 \\ 
@@ -57,10 +57,10 @@ $
    \beta_2 \cos(q_1 + q_2) 
    \end{bmatrix}
    \end{equation}
-$
+```
 
 5. **Constants**
-$
+```math
 \begin{equation}
 \begin{align*}
 \alpha_1 &= m_1 l_{c1}^2 + m_2 l_1^2 + I_1 \\
@@ -68,21 +68,21 @@ $
 \beta_1 &= (m_1 l_{c1} + m_2 l_1)g, \quad \beta_2 = m_2 l_{c2}g
 \end{align*}
 \end{equation}
-$
+```
 
 6. **Energy of the Acrobot**:
-$
+```math
 \begin{equation}
    E(q, \dot{q}) = \frac{1}{2} \dot{q}^T M(q) \dot{q} + P(q)
 \end{equation}
-$
+```
 
 7. **Potential energy**:
-$
+```math
 \begin{equation}
    P(q) = \beta_1 \sin q_1 + \beta_2 \sin(q_1 + q_2)
 \end{equation}
-$
+```
 
 
 
