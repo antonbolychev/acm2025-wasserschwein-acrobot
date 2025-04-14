@@ -33,11 +33,32 @@ or
 $ conda list
 ```
 
+After creating the environment with all dependencies you need to clone [acm2025-wasserschwein-acrobot](https://github.com/antonbolychev/acm2025-wasserschwein-acrobot) repository:
 
+```bash
+$ git clone https://github.com/antonbolychev/acm2025-wasserschwein-acrobot
+```
 
+## Run
 
+Run the [acrobot.py](https://github.com/antonbolychev/acm2025-wasserschwein-acrobot/acrobot.py) file:
 
-## Install
+```bash
+cd <PATH_TO_REPO>
+python acrobat.py
+```
+
+# Authors
+* [Egor Miroshnichenko](https://github.com/Chenkomirosh)
+* [Anton Bolychev](https://github.com/antonbolychev)
+* [Vladislav Sarmatin](https://github.com/VladSarm)
+* [Arsenii Shavrin](https://github.com/ArseniiSh)
+
+# References
+* [Sutton, R. S. (1996). Generalization in Reinforcement Learning: Successful Examples Using Sparse Coarse Coding. In D. Touretzky, M. C. Mozer, & M. Hasselmo (Eds.), Advances in Neural Information Processing Systems (Vol. 8). MIT Press.](https://proceedings.neurips.cc/paper/1995/file/8f1d43620bc6bb580df6e80b0dc05c48-Paper.pdf
+)
+* Sutton, R. S., Barto, A. G. (2018 ). Reinforcement Learning: An Introduction. The MIT Press.
+<!-- ## Install
 
 If you don't have uv install
 
@@ -49,4 +70,4 @@ then run
 
 ```
 uv run acrobot.py
-```
+``` -->
