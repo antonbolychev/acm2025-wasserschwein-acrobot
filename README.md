@@ -11,7 +11,7 @@ The Acrobot environment is based on Sutton's work in "Generalization in Reinforc
 </p>
 
 <p align="center">
-  <img src="gfx/energy_based/acrobot.gif" alt="full stablization of acrobot" width="400">
+  <img src="gfx/energy_based_only/acrobot.gif" alt="full stablization of acrobot" width="400">
 </p>
 <p align="center">
   <em>Acrobot control using energy-based controller without PD control transition</em>
