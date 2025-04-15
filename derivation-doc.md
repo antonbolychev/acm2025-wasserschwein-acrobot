@@ -375,10 +375,8 @@ The option `is_energy_based_only` allows running the simulation with only the en
 
 1. Xin, X., & Kaneda, M. (2007). Analysis of the energy-based swing-up control of the Acrobot. International Journal of Robust and Nonlinear Control, 17(16), 1503-1524.
 
-2. Spong, M. W. (1995). The swing up control problem for the acrobot. IEEE Control Systems Magazine, 15(1), 49-55.
+2. Fantoni, I., Lozano, R., & Spong, M. W. (2000). Energy based control of the Pendubot. IEEE Transactions on Automatic Control, 45(4), 725-729.
 
-3. Fantoni, I., Lozano, R., & Spong, M. W. (2000). Energy based control of the Pendubot. IEEE Transactions on Automatic Control, 45(4), 725-729.
+3. Kolesnichenko, O., & Shiriaev, A. S. (2002). Partial stabilization of underactuated Euler-Lagrange systems via a class of feedback transformations. Systems & Control Letters, 45(2), 121-132.
 
-4. Kolesnichenko, O., & Shiriaev, A. S. (2002). Partial stabilization of underactuated Euler-Lagrange systems via a class of feedback transformations. Systems & Control Letters, 45(2), 121-132.
-
-5. Sutton, R. S. (1996). Generalization in Reinforcement Learning: Successful Examples Using Sparse Coarse Coding. In Advances in Neural Information Processing Systems, Vol. 8. MIT Press.
+4. Sutton, R. S. (1996). Generalization in Reinforcement Learning: Successful Examples Using Sparse Coarse Coding. In Advances in Neural Information Processing Systems, Vol. 8. MIT Press.
