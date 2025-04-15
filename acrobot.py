@@ -5,6 +5,7 @@ from matplotlib.animation import FuncAnimation
 from pathlib import Path
 import tyro
 from dataclasses import dataclass
+from matplotlib.collections import LineCollection
 
 root_dir = Path(__file__).parent
 output_dir = root_dir / "gfx"
@@ -204,12 +205,41 @@ def plot_results(t, y, tau2, t_span, output_dir):
     plt.grid(True)
 
     # Plot phase portrait of q1
+    x = y[0, :] - np.pi / 2
+    y_phase = y[2, :]
+    points = np.array([x, y_phase]).T.reshape(-1, 1, 2)
+    segments = np.concatenate([points[:-1], points[1:]], axis=1)
+
+    # Create a LineCollection with a colormap
+    norm = plt.Normalize(0.0, t.max())  # Normalize to the index range
+    lc = LineCollection(segments, cmap='plasma', norm=norm, linewidth=2)
+    lc.set_array(np.linspace(0, t.max(), int(len(segments)//2)))  # Color based on index (time)
+
+    # Plot with gradient and colorbar
     plt.subplot(3, 2, 3)
-    plt.plot(y[0, :] - np.pi / 2, y[2, :])
+    ax_phase = plt.gca()
+    line = ax_phase.add_collection(lc)
+
+    ax_phase.scatter(x[0],y_phase[0], marker='o', color='green', s=250, label='Start', zorder=6, alpha=0.8)
+    ax_phase.scatter(x[-1],y_phase[-1], marker='x', color='red', s=250, label='Finish', zorder=6, alpha=0.8)
+
+    x_range = max(x) - min(x)
+    y_range = max(y_phase) - min(y_phase)
+
+    x_padding = x_range * 0.1
+    y_padding = y_range * 0.1
+
+    plt.xlim(x.min()-x_padding, x.max()+x_padding)
+    plt.ylim(y_phase.min()-y_padding, y_phase.max()+y_padding)
     plt.xlabel("q1 - π/2 (rad)")
     plt.ylabel("dq1 (rad/s)")
     plt.title("Phase Portrait of Link 1")
     plt.grid(True)
+    plt.legend()
+
+    # Add colorbar
+    cb = plt.colorbar(line, ax=ax_phase)
+    cb.set_label("Time (s)")
 
     # Plot energy
     acrobot = Acrobot()
