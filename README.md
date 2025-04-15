@@ -20,27 +20,33 @@ The Acrobot environment is based on Sutton's work in "Generalization in Reinforc
 
 # User Guide
 
-## Install
+## Quick Start
 
-If you don't have uv install
+### Prerequisites
+
+If you don't have [uv](https://github.com/astral-sh/uv) (a fast Python package installer and resolver) installed, run:
 
 ```bash
 curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
 
-then run 
+### Running the Simulation
+
+To run the standard simulation with full stabilization:
 
 ```bash
 uv run acrobot.py
 ```
 
-The plots and animation will be saved to [`gfx/full_stabilization`](./gfx/full_stabilization/)
+The plots and animation will be saved to [`gfx/full_stabilization/`](./gfx/full_stabilization/).
 
-To view how energy based only without swtiching controller works run 
+To run the simulation with only the energy-based controller (without switching to PD control):
 
 ```bash
 uv run acrobot.py --energy-based-only
 ```
+
+This alternative simulation output will be saved to [`gfx/energy_based_only/`](./gfx/energy_based_only/).
 
 
 # Theory
