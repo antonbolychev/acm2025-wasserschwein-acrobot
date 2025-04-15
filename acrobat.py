@@ -1,11 +1,28 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.integrate import solve_ivp
+from matplotlib.animation import FuncAnimation
+from pathlib import Path
+import tyro
+from dataclasses import dataclass
+
+root_dir = Path(__file__).parent
+output_dir = root_dir / "gfx"
 
 
 class Acrobot:
     def __init__(
-        self, m1=1.0, m2=1.0, l1=1.0, l2=2.0, lc1=0.5, lc2=1.0, I1=0.083, I2=0.33, g=9.8
+        self,
+        m1=1.0,
+        m2=1.0,
+        l1=1.0,
+        l2=2.0,
+        lc1=0.5,
+        lc2=1.0,
+        I1=0.083,
+        I2=0.33,
+        g=9.8,
+        is_energy_based_only=False,
     ):
         """Initialize Acrobot parameters"""
         self.m1 = m1  # mass of link 1 (kg)
@@ -32,6 +49,9 @@ class Acrobot:
         self.kD = 35.8  # must be >35.741 (equation 70)
         self.kP = 61.2  # must be >61.141 (equation 70)
         self.kV = 66.3  # tuned for performance
+
+        self.is_switched = False
+        self.is_energy_based_only = is_energy_based_only
 
     def M(self, q2):
         """Mass matrix (equation 2)"""
@@ -64,7 +84,7 @@ class Acrobot:
         potential = self.P(q1, q2)
         return kinetic + potential
 
-    def controller(self, t, state):
+    def energy_based_controller(self, t, state):
         """Energy-based controller (equation 18)"""
         q1, q2, dq1, dq2 = state
 
@@ -94,6 +114,27 @@ class Acrobot:
         tau2 = -numerator / denominator
 
         return tau2
+
+    def pd_controller(self, t, state):
+        q1, q2, dq1, dq2 = state
+        x = np.array([q1 - np.pi / 2, q2, dq1, dq2])
+
+        F = np.array([-246.481, -98.690, -106.464, -50.138])
+        tau2 = -F @ x
+
+        return tau2
+
+    def controller(self, t, state):
+        # return self.energy_based_controller(t, state)
+        x = np.array([state[0] - np.pi / 2, state[1], state[2], state[3]])
+        if self.is_energy_based_only or (
+            np.abs(x[0]) + np.abs(x[1]) + 0.1 * np.abs(x[2]) + 0.1 * np.abs(x[3]) > 0.04
+            and not self.is_switched
+        ):
+            return self.energy_based_controller(t, state)
+        else:
+            self.is_switched = True
+            return self.pd_controller(t, state)
 
     def dynamics(self, t, state):
         """Acrobot dynamics (equation 1)"""
@@ -125,7 +166,7 @@ class Acrobot:
             t_eval=t_eval,
             method="RK45",
             rtol=1e-6,
-            atol=1e-8,
+            atol=1e-6,
         )
 
         # Calculate tau2 for each time point
@@ -136,14 +177,15 @@ class Acrobot:
         return sol.t, sol.y, tau2_values
 
 
-def plot_results(t, y, tau2):
-    """Plot simulation results"""
+def plot_results(t, y, tau2, t_span, output_dir):
+    """Plot simulation results with x-axis limited to t_span"""
     plt.figure(figsize=(15, 10), num="Acrobot Simulation Results")
 
     # Plot angles
     plt.subplot(3, 2, 1)
     plt.plot(t, y[0, :] - np.pi / 2, label="q1 (link 1)")
     plt.plot(t, y[1, :], label="q2 (link 2)")
+    plt.xlim(t_span)
     plt.xlabel("Time (s)")
     plt.ylabel("Angle (rad)")
     plt.title("Joint Angles")
@@ -154,6 +196,7 @@ def plot_results(t, y, tau2):
     plt.subplot(3, 2, 2)
     plt.plot(t, y[2, :], label="dq1")
     plt.plot(t, y[3, :], label="dq2")
+    plt.xlim(t_span)
     plt.xlabel("Time (s)")
     plt.ylabel("Angular velocity (rad/s)")
     plt.title("Joint Velocities")
@@ -174,6 +217,7 @@ def plot_results(t, y, tau2):
     plt.subplot(3, 2, 4)
     plt.plot(t, E, label="Total Energy")
     plt.axhline(acrobot.Er, color="r", linestyle="--", label="Er (upright energy)")
+    plt.xlim(t_span)
     plt.xlabel("Time (s)")
     plt.ylabel("Energy (J)")
     plt.title("System Energy")
@@ -183,6 +227,7 @@ def plot_results(t, y, tau2):
     # Plot control torque tau2
     plt.subplot(3, 1, 3)
     plt.plot(t, tau2, label="Control Torque τ₂")
+    plt.xlim(t_span)
     plt.xlabel("Time (s)")
     plt.ylabel("Torque (N·m)")
     plt.title("Control Input")
@@ -190,23 +235,132 @@ def plot_results(t, y, tau2):
     plt.grid(True)
 
     plt.tight_layout()
-    plt.show()
+    plt.savefig(output_dir / "plots.svg")
+    print(f"Plots saved to {output_dir}/plots.svg")
 
 
-# Main simulation
-if __name__ == "__main__":
-    # Initialize Acrobot system
+def animate_acrobot(t, y, t_span):
+    """Create animation of acrobot motion"""
+    fig = plt.figure(figsize=(10, 8))
+    ax = fig.add_subplot(111, autoscale_on=False, xlim=(-4, 4), ylim=(-4, 4))
+    ax.set_aspect("equal")
+    ax.grid()
+    ax.set_title("Acrobot Animation")
+
+    # Add axis labels and title
+    ax.set_xlabel("x (m)", fontsize=12)
+    ax.set_ylabel("y (m)", fontsize=12)
+    ax.set_title("Acrobot: Swing-up Control", fontsize=14, pad=20)
+
+    # Create acrobot elements with better visualization
+    (link1,) = ax.plot([], [], "o-", lw=4, color="royalblue", markersize=8)
+    (link2,) = ax.plot([], [], "o-", lw=4, color="crimson", markersize=8)
+
+    # Create proxy artists for the legend if needed
+    from matplotlib.lines import Line2D
+
+    legend_elements = [
+        Line2D(
+            [0], [0], color="royalblue", lw=4, marker="o", markersize=8, label="Link 1"
+        ),
+        Line2D(
+            [0], [0], color="crimson", lw=4, marker="o", markersize=8, label="Link 2"
+        ),
+    ]
+
+    # Add legend with the elements we want to show
+    ax.legend(handles=legend_elements, loc="upper right", fontsize=10)
+
+    time_text = ax.text(0.02, 0.95, "", transform=ax.transAxes)
+    energy_text = ax.text(0.02, 0.90, "", transform=ax.transAxes)
+    torque_text = ax.text(0.02, 0.85, "", transform=ax.transAxes)
+
+    # Calculate link positions
     acrobot = Acrobot()
+    x1 = acrobot.l1 * np.sin(y[0, :])
+    y1 = -acrobot.l1 * np.cos(y[0, :])
+    x2 = x1 + acrobot.l2 * np.sin(y[0, :] + y[1, :])
+    y2 = y1 - acrobot.l2 * np.cos(y[0, :] + y[1, :])
+
+    def init():
+        link1.set_data([], [])
+        link2.set_data([], [])
+        time_text.set_text("")
+        energy_text.set_text("")
+        torque_text.set_text("")
+        return link1, link2, time_text, energy_text, torque_text
+
+    def animate(i):
+        # Link 1 (from base to first joint)
+        link1.set_data([0, y1[i]], [0, x1[i]])
+        # Link 2 (from first joint to end)
+        link2.set_data([y1[i], y2[i]], [x1[i], x2[i]])
+
+        time_text.set_text(f"Time = {t[i]:.2f}s")
+
+        # Calculate energy
+        E = acrobot.E(y[0, i], y[1, i], y[2, i], y[3, i])
+        energy_text.set_text(f"Energy = {E:.2f}J (Er = {acrobot.Er:.2f}J)")
+
+        # Show current torque
+        tau2 = acrobot.controller(t[i], y[:, i])
+        torque_text.set_text(f"Torque τ₂ = {tau2:.2f}N·m")
+
+        return link1, link2, time_text, energy_text, torque_text
+
+    # Choose a reasonable frame rate
+    step = max(1, len(t) // 200)
+    ani = FuncAnimation(
+        fig,
+        animate,
+        frames=range(0, len(t), step),
+        interval=20,
+        blit=True,
+        init_func=init,
+    )
+
+    plt.close()
+    return ani
+
+
+@dataclass
+class SimulationParams:
+    energy_based_only: bool = False
+    output_dir: Path = output_dir
+
+    def __post_init__(self):
+        if self.energy_based_only:
+            self.output_dir = self.output_dir / "energy_based_only"
+        else:
+            self.output_dir = self.output_dir / "full_stabilization"
+
+        self.output_dir.mkdir(parents=True, exist_ok=True)
+
+
+if __name__ == "__main__":
+    params = tyro.cli(SimulationParams)
+
+    # Initialize Acrobot system
+    acrobot = Acrobot(
+        is_energy_based_only=params.energy_based_only,
+    )
 
     # Initial state (near downward position)
     initial_state = [-1.4, 0.0, 0.0, 0.0]  # [q1, q2, dq1, dq2]
 
     # Simulation time
-    t = 30
-    t_span = [0, t]  # 30 seconds
+    t_span = [0, 30]  # 30 seconds
 
     # Run simulation with energy-based controller
     t, y, tau2 = acrobot.simulate(t_span, initial_state)
 
     # Plot results
-    plot_results(t, y, tau2)
+    plot_results(t, y, tau2, t_span, params.output_dir)
+
+    # Create and display animation
+    print("Creating animation...")
+    ani = animate_acrobot(t, y, t_span)
+
+    # Save as GIF
+    ani.save(params.output_dir / "acrobot.gif", writer="pillow", fps=30)
+    print("Animation saved as acrobot.gif")

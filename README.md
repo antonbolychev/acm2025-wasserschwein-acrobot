@@ -1,17 +1,56 @@
 # Acrobot
 
-The Acrobot environment is based on Sutton’s work in “Generalization in Reinforcement Learning: Successful Examples Using Sparse Coarse Coding” and Sutton and Barto’s book. The system consists of two links connected linearly to form a chain, with one end of the chain fixed. The joint between the two links is actuated. The goal is to apply torque to the actuated pivot so that the free end of the linear chain moves to a vertical position, starting from an initial downward hanging state.
+The Acrobot environment is based on Sutton's work in "Generalization in Reinforcement Learning: Successful Examples Using Sparse Coarse Coding" and Sutton and Barto's book. The system consists of two links connected linearly to form a chain, with one end of the chain fixed. The joint between the two links is actuated. The goal is to apply torque to the actuated pivot so that the free end of the linear chain moves to a vertical position, starting from an initial downward hanging state.
 
-<!-- ![movie](https://github.com/antonbolychev/acm2025-wasserschwein-acrobot/blob/master/acrobot_animation.gif) -->
 
-![plots](https://github.com/antonbolychev/acm2025-wasserschwein-acrobot/blob/master/plots.jpg)
+<p align="center">
+  <img src="gfx/full_stabilization/acrobot.gif" alt="full stablization of acrobot" width="400">
+</p>
+<p align="center">
+  <em>Full stabilization of the Acrobot system using an energy-based controller with PD control transition at the apex</em>
+</p>
+
+<p align="center">
+  <img src="gfx/energy_based/acrobot.gif" alt="full stablization of acrobot" width="400">
+</p>
+<p align="center">
+  <em>Acrobot control using energy-based controller without PD control transition</em>
+</p>
+
+
+# User Guide
+
+## Install
+
+If you don't have uv install
+
+```bash
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
+then run 
+
+```bash
+uv run acrobot.py
+```
+
+The plots and animation will be saved to [`gfx/full_stabilization`](./gfx/full_stabilization/)
+
+To view how energy based only without swtiching controller works run 
+
+```bash
+uv run acrobot.py --energy-based-only
+```
+
 
 # Theory
 
-**A two-link planar robot** |
-:-------------------------: |
-![ ](https://github.com/antonbolychev/acm2025-wasserschwein-acrobot/blob/master/two-link_planner_robot.png)|
-
+<p align="center">
+  <img src="gfx/two-link_planner_robot.png" alt="two link planner robot" width="400">
+</p>
+<p align="center">
+  <em>A two-link planar robot</em>
+</p>
 
 1. **Motion equation of a two-link planar robot**:
 ```math
@@ -137,51 +176,7 @@ k_D + \frac{(E - E_r) \Delta}{M_{11}} \neq 0 \quad \forall t \geq 0
 \tau_2 = \frac{(k_V \dot{q}_2 + k_P q_2) \Delta + k_D \big( M_{21}(H_1 + G_1) - M_{11}(H_2 + G_2) \big)}{k_D M_{11} + (E - E_r) \Delta}
 ```
 
-# User Guide
 
-## Installation and dependencies:
-
-All necessary dependencies are in file [requirements.txt](https://github.com/antonbolychev/acm2025-wasserschwein-acrobot/requirements.txt)
-
-Make the environment (pipenv or conda): \
-`pip`: 
-```bash
-$ python -m venv your_env
-$ source your_env/bin/activate
-```
-`conda`: 
-```bash
-$ conda create -n your_env
-$ conda activate your_env
-```
-Then, install the requirements: 
-```bash
-$ pip install -r requirements.txt
-```
-
-To check: 
-```bash
-$ pip freeze
-```
-or 
-```
-$ conda list
-```
-
-After creating the environment with all dependencies you need to clone [acm2025-wasserschwein-acrobot](https://github.com/antonbolychev/acm2025-wasserschwein-acrobot) repository:
-
-```bash
-$ git clone https://github.com/antonbolychev/acm2025-wasserschwein-acrobot
-```
-
-## Run
-
-Run the [acrobot.py](https://github.com/antonbolychev/acm2025-wasserschwein-acrobot/acrobot.py) file:
-
-```bash
-cd <PATH_TO_REPO>
-python acrobat.py
-```
 
 # Authors
 * [Egor Miroshnichenko](https://github.com/Chenkomirosh)
@@ -192,20 +187,7 @@ python acrobat.py
 # References
 * [Sutton, R. S. (1996). Generalization in Reinforcement Learning: Successful Examples Using Sparse Coarse Coding. In D. Touretzky, M. C. Mozer, & M. Hasselmo (Eds.), Advances in Neural Information Processing Systems (Vol. 8). MIT Press.](https://proceedings.neurips.cc/paper/1995/file/8f1d43620bc6bb580df6e80b0dc05c48-Paper.pdf
 )
-* Sutton, R. S., Barto, A. G. (2018 ). Reinforcement Learning: An Introduction. The MIT Press.
-<!-- ## Install
-
-If you don't have uv install
-
-```bash
-curl -LsSf https://astral.sh/uv/install.sh | sh
-```
-
-then run 
-
-```
-uv run acrobot.py
-``` -->
+* Xin, Xin & Kaneda, M.. (2007). Analysis of the energy‐based swing‐up control of the Acrobot. International Journal of Robust and Nonlinear Control. 17. 1503 - 1524. 10.1002/rnc.1184. 
 
 
 Here are the formulas (1)-(6) from the PDF rewritten in LaTeX:
