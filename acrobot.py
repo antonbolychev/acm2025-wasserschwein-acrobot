@@ -235,8 +235,8 @@ def plot_results(t, y, tau2, t_span, output_dir):
     plt.grid(True)
 
     plt.tight_layout()
-    plt.savefig(output_dir / "plots.svg")
-    print(f"Plots saved to {output_dir}/plots.svg")
+    plt.savefig(output_dir / "plots.png")
+    print(f"Plots saved to {output_dir}/plots.png")
 
 
 def animate_acrobot(t, y, t_span):
