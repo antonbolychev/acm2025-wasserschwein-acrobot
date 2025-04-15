@@ -231,7 +231,7 @@ The implementation is contained in a single file (`acrobot.py`) with the followi
 
 ## 🔍 Mathematical Details
 
-For a deeper understanding of the mathematical derivations, please refer to the [derivation document](derivation-doc.md), which includes:
+For a deeper understanding of the mathematical derivations, please refer to the [derivation document]([README-derivation-energy-based.md](README-derivation-energy-based.md)), which includes:
 
 - Detailed derivation of the energy-based control law
 - Stability analysis using Lyapunov theory
