@@ -63,7 +63,7 @@ M(q)\ddot{q} + C(q, \dot{q})\dot{q} + G(q) = \tau
 ```
 
 Where:
-- $q = [q_1, q_2]^T$ , where $q_1, q_2$ represents joint angles and $\dot{q_1}, \dot{q_2} represent their angular velocities accordingly$ 
+- $q = [q_1, q_2]^T$ , where $q_1, q_2$ represents joint angles and $\dot{q_1}, \dot{q_2}$ represent their angular velocities accordingly 
 - $\tau = [0, \tau_2]^T$ represents torques (with $\tau_1 = 0$ since the first joint is unactuated, $\tau_2$ is a control action)
 - $M(q)$ is the inertia matrix
 - $C(q, \dot{q})$ contains Coriolis and centrifugal terms
@@ -72,15 +72,45 @@ Where:
 #### Inertia Matrix $M(q)$
 The inertia matrix $M(q)$ represents the mass distribution of the robotic system as a function of its configuration $q$. It maps joint accelerations to the corresponding inertial forces and torques. For the Acrobot, it's a 2×2 symmetric, positive-definite matrix where each element $M_{ij}$ represents the coupling inertia between joints $i$ and $j$. When a joint accelerates, the inertia matrix determines how much torque is required at each joint to produce that acceleration.
 
+```math
+M(q) = \begin{bmatrix} 
+M_{11} & M_{12} \\ 
+M_{21} & M_{22} 
+\end{bmatrix} = \begin{bmatrix} 
+\alpha_1 + \alpha_2 + 2\alpha_3 \cos q_2 & \alpha_2 + \alpha_3 \cos q_2 \\ 
+\alpha_2 + \alpha_3 \cos q_2 & \alpha_2 
+\end{bmatrix}
+```
+
 #### Coriolis and Centrifugal Terms $C(q, \dot{q})$
 The term $C(q, \dot{q})\dot{q}$ captures the velocity-dependent forces in the system. Specifically:
 - **Coriolis forces**: Arise when a body moves in a rotating reference frame, causing an apparent force perpendicular to both the direction of motion and the axis of rotation.
 - **Centrifugal forces**: Outward forces that appear when an object moves in a curved path, directed away from the center of rotation.
 
+```math
+C(q, \dot{q})\dot{q} = \begin{bmatrix} 
+H_1 \\ 
+H_2 
+\end{bmatrix} = \alpha_3 \begin{bmatrix} 
+-2\dot{q}_1 \dot{q}_2 - \dot{q}_2^2 \\ 
+\dot{q}_1^2 
+\end{bmatrix} \sin q_2
+```
+
 These terms depend on both joint positions $q$ and velocities $\dot{q}$, and they become significant at higher speeds, affecting the dynamics of multi-link systems like the Acrobot.
 
 #### Gravitational Terms $G(q)$
 The vector $G(q)$ represents the effect of gravity on the system as a function of its configuration $q$. Each element $G_i$ corresponds to the torque exerted by gravity at joint $i$. For the Acrobot, these terms depend on the angles of the links relative to the gravitational field and determine how the system behaves when no control input is applied. The gravitational terms are particularly important in underactuated systems like the Acrobot, as they can be exploited for control purposes.
+
+```math
+G(q) = \begin{bmatrix} 
+G_1 \\ 
+G_2 
+\end{bmatrix} = \begin{bmatrix} 
+\beta_1 \cos q_1 + \beta_2 \cos(q_1 + q_2) \\ 
+\beta_2 \cos(q_1 + q_2) 
+\end{bmatrix}
+```
 
 ### Control Strategy in Detail
 
@@ -105,8 +135,16 @@ Where:
 #### System Energy $E$
 The system energy $E$ represents the total mechanical energy of the Acrobot system, which is the sum of kinetic and potential energy. The kinetic energy accounts for the motion of both links, including rotational effects, while the potential energy relates to the height of the center of mass of each link in the gravitational field. This total energy is a key quantity in the energy-based control approach, as it provides a scalar measure that captures the overall state of the system.
 
+```math
+E(q, \dot{q}) = \frac{1}{2} \dot{q}^T M(q) \dot{q} + P(q)
+```
+
 #### Upright Equilibrium Energy $E_r$
 The upright equilibrium energy $E_r$ represents the potential energy of the Acrobot when it is perfectly balanced in the inverted position with both links aligned vertically upward and stationary. This is the target energy level that the energy-based controller aims to achieve. By regulating the system's total energy to match $E_r$, the controller can bring the Acrobot to the vicinity of the upright equilibrium position, even though the system is underactuated.
+
+```math
+E_r = E(q, \dot{q}) \big|_{q_1 = \pi/2, \, q_2 = 0, \, \dot{q} = 0} = \beta_1 + \beta_2
+```
 
 #### Derivation of the Control Law
 
