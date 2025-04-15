@@ -201,30 +201,22 @@ Several improvements could be made to enhance the controller performance:
 
 The full stabilization approach (energy-based + PD) clearly outperforms the energy-based only approach, as seen in the animations and plots. While the energy-based controller can bring the Acrobot close to the upright position, it cannot maintain stability there without the PD controller.
 
+#### Energy-based controller only
 <p align="center">
-  <img src="gfx/full_stabilization/plots.png" alt="full stabilization plots" width="800">
-  <br>
-  <em>Full stabilization controller performance</em>
-</p>
-
-<p align="center">
-  <img src="gfx/full_stabilization/acrobot.gif" alt="full stabilization of acrobot" width="400">
-</p>
-<p align="center">
-  <em>Full stabilization of the Acrobot system using an energy-based controller with PD control transition at the apex</em>
-</p>
-
-<p align="center">
-  <img src="gfx/energy_based_only/plots.png" alt="energy-based only plots" width="800">
-  <br>
-  <em>Energy-based only controller performance</em>
-</p>
-
-<p align="center">
-  <img src="gfx/energy_based_only/acrobot.gif" alt="energy-based control only" width="400">
+  <img src="gfx/energy_based_only/plots.png" alt="energy-based only plots" height="350">
+  <img src="gfx/energy_based_only/acrobot.gif" alt="energy-based control only" height="350">
 </p>
 <p align="center">
   <em>Acrobot using only energy-based controller (without PD stabilization)</em>
+</p>
+
+#### Full stabilization
+<p align="center">
+   <img src="gfx/full_stabilization/plots.png" alt="full stabilization plots" height="350">
+  <img src="gfx/full_stabilization/acrobot.gif" alt="full stabilization of acrobot" height="350">
+</p>
+<p align="center">
+  <em>Full stabilization of the Acrobot system using an energy-based controller with PD control transition at the apex</em>
 </p>
 
 ## 👨‍💻 Code Structure
