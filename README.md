@@ -69,6 +69,19 @@ Where:
 - $C(q, \dot{q})$ contains Coriolis and centrifugal terms
 - $G(q)$ represents gravitational terms
 
+#### Inertia Matrix $M(q)$
+The inertia matrix $M(q)$ represents the mass distribution of the robotic system as a function of its configuration $q$. It maps joint accelerations to the corresponding inertial forces and torques. For the Acrobot, it's a 2×2 symmetric, positive-definite matrix where each element $M_{ij}$ represents the coupling inertia between joints $i$ and $j$. When a joint accelerates, the inertia matrix determines how much torque is required at each joint to produce that acceleration.
+
+#### Coriolis and Centrifugal Terms $C(q, \dot{q})$
+The term $C(q, \dot{q})\dot{q}$ captures the velocity-dependent forces in the system. Specifically:
+- **Coriolis forces**: Arise when a body moves in a rotating reference frame, causing an apparent force perpendicular to both the direction of motion and the axis of rotation.
+- **Centrifugal forces**: Outward forces that appear when an object moves in a curved path, directed away from the center of rotation.
+
+These terms depend on both joint positions $q$ and velocities $\dot{q}$, and they become significant at higher speeds, affecting the dynamics of multi-link systems like the Acrobot.
+
+#### Gravitational Terms $G(q)$
+The vector $G(q)$ represents the effect of gravity on the system as a function of its configuration $q$. Each element $G_i$ corresponds to the torque exerted by gravity at joint $i$. For the Acrobot, these terms depend on the angles of the links relative to the gravitational field and determine how the system behaves when no control input is applied. The gravitational terms are particularly important in underactuated systems like the Acrobot, as they can be exploited for control purposes.
+
 ### Control Strategy in Detail
 
 #### 1. Energy-Based Swing-Up Control
@@ -89,11 +102,61 @@ Where:
 - $E_r$ is the energy at the upright equilibrium
 - $k_D$, $k_P$ are positive constants
 
-The derived control law is:
+#### System Energy $E$
+The system energy $E$ represents the total mechanical energy of the Acrobot system, which is the sum of kinetic and potential energy. The kinetic energy accounts for the motion of both links, including rotational effects, while the potential energy relates to the height of the center of mass of each link in the gravitational field. This total energy is a key quantity in the energy-based control approach, as it provides a scalar measure that captures the overall state of the system.
+
+#### Upright Equilibrium Energy $E_r$
+The upright equilibrium energy $E_r$ represents the potential energy of the Acrobot when it is perfectly balanced in the inverted position with both links aligned vertically upward and stationary. This is the target energy level that the energy-based controller aims to achieve. By regulating the system's total energy to match $E_r$, the controller can bring the Acrobot to the vicinity of the upright equilibrium position, even though the system is underactuated.
+
+#### Derivation of the Control Law
+
+The control law is derived using Lyapunov's direct method, which involves constructing a positive definite function and then finding conditions to make its time derivative negative semi-definite.
+
+1. First, we define a Lyapunov function candidate:
+
+```math
+V = \frac{1}{2} (E - E_r)^2 + \frac{1}{2} k_D \dot{q}_2^2 + \frac{1}{2} k_P q_2^2
+```
+
+2. We differentiate this function with respect to time to get $\dot{V}$:
+
+```math
+\dot{V} = (E - E_r)\dot{E} + k_D \dot{q}_2 \ddot{q}_2 + k_P q_2 \dot{q}_2
+```
+
+3. Since $\dot{E} = \dot{q}^T \tau = \dot{q}_2 \tau_2$ (as $\tau_1 = 0$), we have:
+
+```math
+\dot{V} = \dot{q}_2 \left( (E - E_r) \tau_2 + k_D \ddot{q}_2 + k_P q_2 \right)
+```
+
+4. To ensure $\dot{V} \leq 0$, we set:
+
+```math
+(E - E_r) \tau_2 + k_D \ddot{q}_2 + k_P q_2 = -k_V \dot{q}_2
+```
+
+Where $k_V > 0$ is a damping coefficient.
+
+5. Solving for $\tau_2$ using the system dynamics equations leads to the final control law:
 
 ```math
 \tau_2 = -\frac{(k_V \dot{q}_2 + k_P q_2)\Delta + k_D[M_{21}(H_1 + G_1) - M_{11}(H_2 + G_2)]}{k_D M_{11} + (E - E_r)\Delta}
 ```
+
+Where:
+- $k_V$, $k_P$, and $k_D$ are positive control gains
+- $\dot{q}_2$ is the angular velocity of the second joint
+- $q_2$ is the angle of the second joint
+- $\Delta = \det(M(q)) = M_{11}M_{22} - M_{12}M_{21}$ is the determinant of the inertia matrix
+- $M_{ij}$ are elements of the inertia matrix $M(q)$
+- $H_1$ and $H_2$ are the Coriolis and centrifugal terms
+- $G_1$ and $G_2$ are the gravitational terms
+- $E$ is the current system energy
+- $E_r$ is the target energy at the upright equilibrium
+
+For the complete mathematical derivation with all steps and proofs, see the [detailed derivation document](derivation-doc.md).
+
 
 #### 2. Linear PD Control for Stabilization
 
@@ -169,7 +232,7 @@ The full stabilization approach (energy-based + PD) clearly outperforms the ener
 The implementation is contained in a single file (`acrobot.py`) with the following key components:
 
 * [**Acrobot Class**](https://github.com/antonbolychev/acm2025-wasserschwein-acrobot/blob/d6ca88ff417ecafb20038cae29a3820ae6b99311/acrobot.py#L14): Defines the system dynamics and control methods
-* [**Simulation Function**](https://github.com/antonbolychev/acm2025-wasserschwein-acrobot/blob/d6ca88ff417ecafb20038cae29a3820ae6b99311/acrobot.py#L161C9-L161C17): Integrates the equations of motion using `solve_ivp`
+* [**Simulation Function**](https://github.com/antonbolychev/acm2025-wasserschwein-acrobot/blob/d6ca88ff417ecafb20038cae29a3820ae6b99311/acrobot.py#L161C9-L161C17): Integrates the equations of motion using `solve_ivp` via RK4 scheme
 * [**Controller**](https://github.com/antonbolychev/acm2025-wasserschwein-acrobot/blob/d6ca88ff417ecafb20038cae29a3820ae6b99311/acrobot.py#L128): Enable PD controller for Acrobot stabilization
 * [**Visualization Functions**](https://github.com/antonbolychev/acm2025-wasserschwein-acrobot/blob/d6ca88ff417ecafb20038cae29a3820ae6b99311/acrobot.py#L272): Generates plots and animations
 * [**Command-Line Interface**](https://github.com/antonbolychev/acm2025-wasserschwein-acrobot/blob/d6ca88ff417ecafb20038cae29a3820ae6b99311/acrobot.py#L357): Uses `tyro` for argument parsing
