@@ -48,6 +48,11 @@ uv run acrobot.py --energy-based-only
 
 This alternative simulation output will be saved to [`gfx/energy_based_only/`](./gfx/energy_based_only/).
 
+## Code Overview
+
+* **Single-file implementation**: The entire Acrobot simulation is contained in [`acrobot.py`](./acrobot.py), using tyro for command-line argument parsing.
+* **Simulation output**: `Acrobot.simulate()` returns the full trajectory of the system.
+* **Visualization & saving**: The `plot_results` and `animation` functions generate and save plots/animations to the `output` folder.
 
 # Theory
 
