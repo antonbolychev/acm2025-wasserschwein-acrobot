@@ -51,6 +51,8 @@ This alternative simulation output will be saved to [`gfx/energy_based_only/`](.
 
 # Theory
 
+## Plant discription
+
 <p align="center">
   <img src="gfx/two-link_planner_robot.png" alt="two link planner robot" width="400">
 </p>
@@ -116,6 +118,8 @@ This alternative simulation output will be saved to [`gfx/energy_based_only/`](.
 \beta_1 = (m_1 l_{c1} + m_2 l_1)g, \quad \beta_2 = m_2 l_{c2}g
 
 ```
+
+## Energy based controller
 
 6. **Energy of the Acrobot**:
 ```math
@@ -184,7 +188,19 @@ k_D + \frac{(E - E_r) \Delta}{M_{11}} \neq 0 \quad \forall t \geq 0
 \tau_2 = \frac{(k_V \dot{q}_2 + k_P q_2) \Delta + k_D \big( M_{21}(H_1 + G_1) - M_{11}(H_2 + G_2) \big)}{k_D M_{11} + (E - E_r) \Delta}
 ```
 
+# Results
 
+## Energy based controller
+
+<p align="center">
+  <img src="gfx/energy_based_only/plots.png" alt="full stablization of acrobot" width="600">
+</p>
+
+## Energy based controller with stabilization
+
+<p align="center">
+  <img src="gfx/full_stabilization/plots.png" alt="full stablization of acrobot" width="600">
+</p>
 
 # Authors
 * [Egor Miroshnichenko](https://github.com/Chenkomirosh)
