@@ -107,9 +107,13 @@ This alternative simulation output will be saved to [`gfx/energy_based_only/`](.
 5. **Constants**
 ```math
 
-\alpha_1 &= m_1 l_{c1}^2 + m_2 l_1^2 + I_1 
-\alpha_2 &= m_2 l_{c2}^2 + I_2, \quad \alpha_3 = m_2 l_1 l_{c2} 
-\beta_1 &= (m_1 l_{c1} + m_2 l_1)g, \quad \beta_2 = m_2 l_{c2}g
+\alpha_1 = m_1 l_{c1}^2 + m_2 l_1^2 + I_1 
+```
+```math
+\alpha_2 = m_2 l_{c2}^2 + I_2, \quad \alpha_3 = m_2 l_1 l_{c2} 
+```
+```math
+\beta_1 = (m_1 l_{c1} + m_2 l_1)g, \quad \beta_2 = m_2 l_{c2}g
 
 ```
 
