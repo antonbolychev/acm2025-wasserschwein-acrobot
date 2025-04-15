@@ -193,13 +193,13 @@ k_D + \frac{(E - E_r) \Delta}{M_{11}} \neq 0 \quad \forall t \geq 0
 ## Energy based controller
 
 <p align="center">
-  <img src="gfx/energy_based_only/plots.png" alt="full stablization of acrobot" width="600">
+  <img src="gfx/energy_based_only/plots.png" alt="full stablization of acrobot" width="800">
 </p>
 
 ## Energy based controller with stabilization
 
 <p align="center">
-  <img src="gfx/full_stabilization/plots.png" alt="full stablization of acrobot" width="600">
+  <img src="gfx/full_stabilization/plots.png" alt="full stablization of acrobot" width="800">
 </p>
 
 # Authors
