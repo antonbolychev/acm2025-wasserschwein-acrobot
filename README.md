@@ -17,13 +17,6 @@ The Acrobot system consists of two links connected in a chain, with one end fixe
 1. **Energy-Based Control**: Initially swings up the Acrobot by regulating its total energy
 2. **PD Control**: Takes over near the upright position for stabilization
 
-<p align="center">
-  <img src="gfx/energy_based_only/acrobot.gif" alt="energy-based control only" width="400">
-</p>
-<p align="center">
-  <em>Acrobot using only energy-based controller (without PD stabilization)</em>
-</p>
-
 ## 🚀 Quick Start
 
 ### Prerequisites
@@ -70,8 +63,8 @@ M(q)\ddot{q} + C(q, \dot{q})\dot{q} + G(q) = \tau
 ```
 
 Where:
-- $q = [q_1, q_2]^T$ represents joint angles
-- $\tau = [0, \tau_2]^T$ represents torques (with $\tau_1 = 0$ since the first joint is unactuated)
+- $q = [q_1, q_2]^T$ , where $q_1, q_2$ represents joint angles and $\dot{q_1}, \dot{q_2} represent their angular velocities accordingly$ 
+- $\tau = [0, \tau_2]^T$ represents torques (with $\tau_1 = 0$ since the first joint is unactuated, $\tau_2$ is a control action)
 - $M(q)$ is the inertia matrix
 - $C(q, \dot{q})$ contains Coriolis and centrifugal terms
 - $G(q)$ represents gravitational terms
@@ -130,9 +123,7 @@ The current implementation has several limitations:
 
 1. **Non-Stationary Balancing**: As shown in the animations, the controller does not achieve perfectly stationary balancing at the upright position. The system exhibits small oscillations around the equilibrium point.
 
-2. **Control Effort**: The control signal (torque) has high-frequency components and large magnitudes at certain points, which could be problematic for real physical systems.
-
-3. **Parameter Sensitivity**: The controller performance is sensitive to the tuning parameters ($k_D$, $k_P$, $k_V$) and may require re-tuning for different Acrobot parameters.
+2. **Parameter Sensitivity**: The controller performance is sensitive to the tuning parameters ($k_D$, $k_P$, $k_V$) and may require re-tuning for different Acrobot parameters.
 
 ### Potential Improvements
 
@@ -140,16 +131,8 @@ Several improvements could be made to enhance the controller performance:
 
 1. **Stationary Balancing**: The controller can be modified to achieve truly stationary balancing by:
    - Fine-tuning the PD controller gains
-   - Implementing an LQR controller for the linearized system around the upright position
-   - Adding integral action to eliminate steady-state error
 
 2. **Optimal Control Parameters**: Using optimization techniques to find optimal control parameters rather than manual tuning
-
-3. **Feedforward Terms**: Adding feedforward terms to compensate for known dynamics could improve performance
-
-4. **Reduced Control Effort**: Implementing constraints on control input to reduce excessive torques
-
-5. **Robust Control**: Developing a robust control strategy to handle parameter uncertainties and external disturbances
 
 ### Comparative Analysis
 
@@ -162,19 +145,34 @@ The full stabilization approach (energy-based + PD) clearly outperforms the ener
 </p>
 
 <p align="center">
+  <img src="gfx/full_stabilization/acrobot.gif" alt="full stabilization of acrobot" width="400">
+</p>
+<p align="center">
+  <em>Full stabilization of the Acrobot system using an energy-based controller with PD control transition at the apex</em>
+</p>
+
+<p align="center">
   <img src="gfx/energy_based_only/plots.png" alt="energy-based only plots" width="800">
   <br>
   <em>Energy-based only controller performance</em>
+</p>
+
+<p align="center">
+  <img src="gfx/energy_based_only/acrobot.gif" alt="energy-based control only" width="400">
+</p>
+<p align="center">
+  <em>Acrobot using only energy-based controller (without PD stabilization)</em>
 </p>
 
 ## 👨‍💻 Code Structure
 
 The implementation is contained in a single file (`acrobot.py`) with the following key components:
 
-* **Acrobot Class**: Defines the system dynamics and control methods
-* **Simulation Function**: Integrates the equations of motion using `solve_ivp`
-* **Visualization Functions**: Generates plots and animations
-* **Command-Line Interface**: Uses `tyro` for argument parsing
+* [**Acrobot Class**](https://github.com/antonbolychev/acm2025-wasserschwein-acrobot/blob/d6ca88ff417ecafb20038cae29a3820ae6b99311/acrobot.py#L14): Defines the system dynamics and control methods
+* [**Simulation Function**](https://github.com/antonbolychev/acm2025-wasserschwein-acrobot/blob/d6ca88ff417ecafb20038cae29a3820ae6b99311/acrobot.py#L161C9-L161C17): Integrates the equations of motion using `solve_ivp`
+* [**Controller**](https://github.com/antonbolychev/acm2025-wasserschwein-acrobot/blob/d6ca88ff417ecafb20038cae29a3820ae6b99311/acrobot.py#L128): Enable PD controller for Acrobot stabilization
+* [**Visualization Functions**](https://github.com/antonbolychev/acm2025-wasserschwein-acrobot/blob/d6ca88ff417ecafb20038cae29a3820ae6b99311/acrobot.py#L272): Generates plots and animations
+* [**Command-Line Interface**](https://github.com/antonbolychev/acm2025-wasserschwein-acrobot/blob/d6ca88ff417ecafb20038cae29a3820ae6b99311/acrobot.py#L357): Uses `tyro` for argument parsing
 
 ## 🔍 Mathematical Details
 
@@ -194,4 +192,3 @@ For a deeper understanding of the mathematical derivations, please refer to the 
 ## 📚 References
 * [Sutton, R. S. (1996). Generalization in Reinforcement Learning: Successful Examples Using Sparse Coarse Coding.](https://proceedings.neurips.cc/paper/1995/file/8f1d43620bc6bb580df6e80b0dc05c48-Paper.pdf)
 * Xin, Xin & Kaneda, M. (2007). Analysis of the energy‐based swing‐up control of the Acrobot. International Journal of Robust and Nonlinear Control, 17, 1503-1524.
-* Spong, M. W. (1995). The swing up control problem for the acrobot. IEEE Control Systems Magazine, 15(1), 49-55.
