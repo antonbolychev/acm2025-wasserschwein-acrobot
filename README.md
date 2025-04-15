@@ -203,8 +203,8 @@ The full stabilization approach (energy-based + PD) clearly outperforms the ener
 
 #### Energy-based controller only
 <p align="center">
-  <img src="gfx/energy_based_only/plots.png" alt="energy-based only plots" height="200">
-  <img src="gfx/energy_based_only/acrobot.gif" alt="energy-based control only" height="200">
+  <img src="gfx/energy_based_only/plots.png" alt="energy-based only plots" height="250">
+  <img src="gfx/energy_based_only/acrobot.gif" alt="energy-based control only" height="250">
 </p>
 <p align="center">
   <em>Acrobot using only energy-based controller (without PD stabilization)</em>
@@ -212,8 +212,8 @@ The full stabilization approach (energy-based + PD) clearly outperforms the ener
 
 #### Full stabilization
 <p align="center">
-  <img src="gfx/full_stabilization/plots.png" alt="full stabilization plots" height="200">
-  <img src="gfx/full_stabilization/acrobot.gif" alt="full stabilization of acrobot" height="200">
+  <img src="gfx/full_stabilization/plots.png" alt="full stabilization plots" height="250">
+  <img src="gfx/full_stabilization/acrobot.gif" alt="full stabilization of acrobot" height="250">
 </p>
 <p align="center">
   <em>Full stabilization of the Acrobot system using an energy-based controller with PD control transition at the apex</em>
