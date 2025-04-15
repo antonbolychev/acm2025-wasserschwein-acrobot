@@ -106,13 +106,11 @@ This alternative simulation output will be saved to [`gfx/energy_based_only/`](.
 
 5. **Constants**
 ```math
-\begin{equation}
-\begin{align*}
-\alpha_1 &= m_1 l_{c1}^2 + m_2 l_1^2 + I_1 \\
-\alpha_2 &= m_2 l_{c2}^2 + I_2, \quad \alpha_3 = m_2 l_1 l_{c2} \\
+
+\alpha_1 &= m_1 l_{c1}^2 + m_2 l_1^2 + I_1 
+\alpha_2 &= m_2 l_{c2}^2 + I_2, \quad \alpha_3 = m_2 l_1 l_{c2} 
 \beta_1 &= (m_1 l_{c1} + m_2 l_1)g, \quad \beta_2 = m_2 l_{c2}g
-\end{align*}
-\end{equation}
+
 ```
 
 6. **Energy of the Acrobot**:
@@ -195,56 +193,4 @@ k_D + \frac{(E - E_r) \Delta}{M_{11}} \neq 0 \quad \forall t \geq 0
 )
 * Xin, Xin & Kaneda, M.. (2007). Analysis of the energy‐based swing‐up control of the Acrobot. International Journal of Robust and Nonlinear Control. 17. 1503 - 1524. 10.1002/rnc.1184. 
 
-
-Here are the formulas (1)-(6) from the PDF rewritten in LaTeX:
-
-1. **Motion equation of a two-link planar robot**:
-   \[
-   M(q)\ddot{q} + C(q, \dot{q})\dot{q} + G(q) = \tau
-   \]
-
-2. **Inertia matrix**:
-   \[
-   M(q) = \begin{bmatrix} 
-   M_{11} & M_{12} \\ 
-   M_{21} & M_{22} 
-   \end{bmatrix} = \begin{bmatrix} 
-   \alpha_1 + \alpha_2 + 2\alpha_3 \cos q_2 & \alpha_2 + \alpha_3 \cos q_2 \\ 
-   \alpha_2 + \alpha_3 \cos q_2 & \alpha_2 
-   \end{bmatrix}
-   \]
-
-3. **Coriolis and centrifugal terms**:
-   \[
-   C(q, \dot{q})\dot{q} = \begin{bmatrix} 
-   H_1 \\ 
-   H_2 
-   \end{bmatrix} = \alpha_3 \begin{bmatrix} 
-   -2\dot{q}_1 \dot{q}_2 - \dot{q}_2^2 \\ 
-   \dot{q}_1^2 
-   \end{bmatrix} \sin q_2
-   \]
-
-4. **Gravitational terms**:
-   \[
-   G(q) = \begin{bmatrix} 
-   G_1 \\ 
-   G_2 
-   \end{bmatrix} = \begin{bmatrix} 
-   \beta_1 \cos q_1 + \beta_2 \cos(q_1 + q_2) \\ 
-   \beta_2 \cos(q_1 + q_2) 
-   \end{bmatrix}
-   \]
-
-5. **Energy of the Acrobot**:
-   \[
-   E(q, \dot{q}) = \frac{1}{2} \dot{q}^T M(q) \dot{q} + P(q)
-   \]
-
-6. **Potential energy**:
-   \[
-   P(q) = \beta_1 \sin q_1 + \beta_2 \sin(q_1 + q_2)
-   \]
-
-Let me know if you'd like any modifications or additional formulas!
 
