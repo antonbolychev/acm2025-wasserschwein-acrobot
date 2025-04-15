@@ -193,7 +193,7 @@ Where:
 - $E$ is the current system energy
 - $E_r$ is the target energy at the upright equilibrium
 
-For the complete mathematical derivation with all steps and proofs, see the [detailed derivation document](derivation-doc.md).
+For the complete mathematical derivation with all steps and proofs, see the [detailed derivation document](https://github.com/antonbolychev/acm2025-wasserschwein-acrobot/blob/master/README-derivation-energy-based.md).
 
 
 #### 2. Linear PD Control for Stabilization
