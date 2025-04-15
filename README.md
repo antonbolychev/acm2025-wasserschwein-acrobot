@@ -1,26 +1,30 @@
-# Acrobot
+# Acrobot Control System
 
-The Acrobot system consists of two links connected linearly to form a chain, with one end of the chain fixed. The joint between the two links is actuated. The goal is to apply torque to the actuated pivot so that the free end of the linear chain moves to a vertical position, starting from an initial downward hanging state.
-
+This repository implements an energy-based controller for the Acrobot, a classic underactuated robotic system. The Acrobot consists of two links connected linearly, with only the second joint actuated, presenting a challenging control problem.
 
 <p align="center">
-  <img src="gfx/full_stabilization/acrobot.gif" alt="full stablization of acrobot" width="400">
+  <img src="gfx/full_stabilization/acrobot.gif" alt="full stabilization of acrobot" width="400">
 </p>
 <p align="center">
   <em>Full stabilization of the Acrobot system using an energy-based controller with PD control transition at the apex</em>
 </p>
 
+## 📋 Overview
+
+The Acrobot system consists of two links connected in a chain, with one end fixed. Only the joint between the two links is actuated. The challenge is to swing up the Acrobot from its initial downward hanging position to an upright balanced position using only the torque applied at the middle joint.
+
+**Control Strategy:**
+1. **Energy-Based Control**: Initially swings up the Acrobot by regulating its total energy
+2. **PD Control**: Takes over near the upright position for stabilization
+
 <p align="center">
-  <img src="gfx/energy_based_only/acrobot.gif" alt="full stablization of acrobot" width="400">
+  <img src="gfx/energy_based_only/acrobot.gif" alt="energy-based control only" width="400">
 </p>
 <p align="center">
-  <em>Acrobot control using energy-based controller without PD control transition</em>
+  <em>Acrobot using only energy-based controller (without PD stabilization)</em>
 </p>
 
-
-# User Guide
-
-## Quick Start
+## 🚀 Quick Start
 
 ### Prerequisites
 
@@ -38,7 +42,7 @@ To run the standard simulation with full stabilization:
 uv run acrobot.py
 ```
 
-The plots and animation will be saved to [`gfx/full_stabilization/`](./gfx/full_stabilization/).
+The plots and animation will be saved to `gfx/full_stabilization/`.
 
 To run the simulation with only the energy-based controller (without switching to PD control):
 
@@ -46,17 +50,11 @@ To run the simulation with only the energy-based controller (without switching t
 uv run acrobot.py --energy-based-only
 ```
 
-This alternative simulation output will be saved to [`gfx/energy_based_only/`](./gfx/energy_based_only/).
+This alternative simulation output will be saved to `gfx/energy_based_only/`.
 
-## Code Overview
+## 🧠 Technical Background
 
-* **Single-file implementation**: The entire Acrobot simulation is contained in [`acrobot.py`](./acrobot.py), using tyro for command-line argument parsing.
-* **Simulation output**: `Acrobot.simulate()` returns the full trajectory of the system.
-* **Visualization & saving**: The `plot_results` and `animation` functions generate and save plots/animations to the `output` folder.
-
-# Theory
-
-## Plant discription
+### Acrobot Dynamics
 
 <p align="center">
   <img src="gfx/two-link_planner_robot.png" alt="two link planner robot" width="400">
@@ -65,169 +63,135 @@ This alternative simulation output will be saved to [`gfx/energy_based_only/`](.
   <em>A two-link planar robot</em>
 </p>
 
-Motion equation of a two-link planar robot is
-```math
-\begin{equation}
-   M(q)\ddot{q} + C(q, \dot{q})\dot{q} + G(q) = \tau , \text{where}\ q = [q_1, q_2]^T, \tau = [0, \tau_2]^T
-\end{equation}
-```
-As we worked with Acrobot we put $`\tau_1 = 0`$, $`\tau_2`$ is a control action.
- 
-**Inertia matrix** have the next form:
-```math
-\begin{equation}
-   M(q) = \begin{bmatrix} 
-   M_{11} & M_{12} \\ 
-   M_{21} & M_{22} 
-   \end{bmatrix} = \begin{bmatrix} 
-   \alpha_1 + \alpha_2 + 2\alpha_3 \cos q_2 & \alpha_2 + \alpha_3 \cos q_2 \\ 
-   \alpha_2 + \alpha_3 \cos q_2 & \alpha_2 
-   \end{bmatrix}
-   \end{equation}
-```
-
-**Coriolis and centrifugal** terms have the nex form:
-```math
-\begin{equation}
-   C(q, \dot{q})\dot{q} = \begin{bmatrix} 
-   H_1 \\ 
-   H_2 
-   \end{bmatrix} = \alpha_3 \begin{bmatrix} 
-   -2\dot{q}_1 \dot{q}_2 - \dot{q}_2^2 \\ 
-   \dot{q}_1^2 
-   \end{bmatrix} \sin q_2
-   \end{equation}
-```
-
-**Gravitational** terms have the next form:
-```math
-\begin{equation}
-   G(q) = \begin{bmatrix} 
-   G_1 \\ 
-   G_2 
-   \end{bmatrix} = \begin{bmatrix} 
-   \beta_1 \cos q_1 + \beta_2 \cos(q_1 + q_2) \\ 
-   \beta_2 \cos(q_1 + q_2) 
-   \end{bmatrix}
-   \end{equation}
-```
-
-For convenience, the following constants are introduced:
-```math
-
-\alpha_1 = m_1 l_{c1}^2 + m_2 l_1^2 + I_1 
-```
-```math
-\alpha_2 = m_2 l_{c2}^2 + I_2, \quad \alpha_3 = m_2 l_1 l_{c2} 
-```
-```math
-\beta_1 = (m_1 l_{c1} + m_2 l_1)g, \quad \beta_2 = m_2 l_{c2}g
-
-```
-
-## Energy based controller
-
-The energy of the Acrobot is expressed as
-```math
-\begin{equation}
-   E(q, \dot{q}) = \frac{1}{2} \dot{q}^T M(q) \dot{q} + P(q)
-\end{equation}
-```
-
-where $`P(q)`$ is the potential energy of the Acrobot and is set as
-```math
-\begin{equation}
-   P(q) = \beta_1 \sin q_1 + \beta_2 \sin(q_1 + q_2)
-\end{equation}
-```
-
-Observe the following balanced upright state of the Acrobot:
+The motion equation of the Acrobot is:
 
 ```math
-q_1 = \frac{\pi}{2} \ (\text{mod} \ 2\pi), \quad q_2 = 0, \quad \dot{q}_1 = 0, \quad \dot{q}_2 = 0
+M(q)\ddot{q} + C(q, \dot{q})\dot{q} + G(q) = \tau
 ```
-Here, $`q_1`$ (the underactuated cyclic variable) lies in $`\mathbb{S}^1 `$, while $`q_2`$ (the actuated shape variable) is in  $`\mathbb{R}`$. 
 
-We propose the following Lyapunov function candidate::
+Where:
+- $q = [q_1, q_2]^T$ represents joint angles
+- $\tau = [0, \tau_2]^T$ represents torques (with $\tau_1 = 0$ since the first joint is unactuated)
+- $M(q)$ is the inertia matrix
+- $C(q, \dot{q})$ contains Coriolis and centrifugal terms
+- $G(q)$ represents gravitational terms
+
+### Control Strategy in Detail
+
+#### 1. Energy-Based Swing-Up Control
+
+The energy-based controller works by:
+- Calculating the total energy of the system
+- Comparing it to the target energy at the upright position
+- Applying torque to regulate the energy to the target value
+
+The Lyapunov function candidate used is:
 
 ```math
 V = \frac{1}{2} (E - E_r)^2 + \frac{1}{2} k_D \dot{q}_2^2 + \frac{1}{2} k_P q_2^2
 ```
 
-where $`E_r = \beta_1 + \beta_2`$ represents the Acrobot's energy at the upright equilibrium, and $`k_D`$, $`k_P`$ are positive constants
+Where:
+- $E$ is the current system energy
+- $E_r$ is the energy at the upright equilibrium
+- $k_D$, $k_P$ are positive constants
 
-Compute the total energy at upright equilibrium:
+The derived control law is:
 
 ```math
-E_r = E(q, \dot{q}) \big|_{q_1 = \pi/2, \, q_2 = 0, \, \dot{q} = 0} = \beta_1 + \beta_2
+\tau_2 = -\frac{(k_V \dot{q}_2 + k_P q_2)\Delta + k_D[M_{21}(H_1 + G_1) - M_{11}(H_2 + G_2)]}{k_D M_{11} + (E - E_r)\Delta}
 ```
 
-Differentiating  $`V`$ and noting  $`\dot{E} = \dot{q}_2 \tau_2`$ , we obtain:  
-```math
-\dot{V} = \dot{q}_2 \left( (E - E_r) \tau_2 + k_D \ddot{q}_2 + k_P q_2 \right).  
-```
-To ensure $`\dot{V} \leq 0`$, we enforce:  
-```math
-(E - E_r) \tau_2 + k_D \ddot{q}_2 + k_P q_2 = -k_V \dot{q}_2,  
-```  
-where $`k_V > 0`$. This yields $`\dot{V} = -k_V \dot{q}_2^2 \leq 0`$.  
+#### 2. Linear PD Control for Stabilization
 
+Once the system is near the upright position, a linear PD controller takes over:
 
-
-Solving for $`\tau_2`$ requires ensuring the coefficient of $`\tau_2`$ is non-zero $`\forall t \geq 0`$ . This leads to the critical condition:  
 ```math
-k_D > \max_q f(q), \quad \text{where} \quad f(q) = \frac{(E_r - P(q))\Delta}{M_{11}}.  
+\tau_2 = -F \cdot x
 ```
 
-Now we have solvability condition for $`\tau_2`$:
+Where:
+- $x = [q_1 - \pi/2, q_2, \dot{q}_1, \dot{q}_2]^T$ is the state error vector
+- $F$ is the feedback gain matrix
 
-```math
-\left( k_D + \frac{(E - E_r) \Delta}{M_{11}} \right) \tau_2 = \frac{(k_V \dot{q}_2 + k_P q_2) \Delta + k_D \big( M_{21}(H_1 + G_1) - M_{11}(H_2 + G_2) \big)}{M_{11}}
-```
+## 📊 Results and Discussion
 
-where $`\Delta = M_{11} M_{22} - M_{12} M_{21} = \alpha_1 \alpha_2 - \alpha_3^2 \cos^2 q_2 > 0`$
+### What Works Well
 
-Final control law for $`\tau_2`$ have the next form:
-```math
-\tau_2 = \frac{(k_V \dot{q}_2 + k_P q_2) \Delta + k_D \big( M_{21}(H_1 + G_1) - M_{11}(H_2 + G_2) \big)}{k_D M_{11} + (E - E_r) \Delta}
-```
+The implemented controller demonstrates effective performance:
 
-# Results
+1. **Successful Swing-up**: The energy-based controller successfully swings the Acrobot from the downward position toward the upright position
+2. **Smooth Energy Regulation**: Energy gradually converges to the target value
+3. **Effective Switching Strategy**: The transition between energy-based and PD controllers happens seamlessly
 
-## Energy based controller
+### Current Limitations
+
+The current implementation has several limitations:
+
+1. **Non-Stationary Balancing**: As shown in the animations, the controller does not achieve perfectly stationary balancing at the upright position. The system exhibits small oscillations around the equilibrium point.
+
+2. **Control Effort**: The control signal (torque) has high-frequency components and large magnitudes at certain points, which could be problematic for real physical systems.
+
+3. **Parameter Sensitivity**: The controller performance is sensitive to the tuning parameters ($k_D$, $k_P$, $k_V$) and may require re-tuning for different Acrobot parameters.
+
+### Potential Improvements
+
+Several improvements could be made to enhance the controller performance:
+
+1. **Stationary Balancing**: The controller can be modified to achieve truly stationary balancing by:
+   - Fine-tuning the PD controller gains
+   - Implementing an LQR controller for the linearized system around the upright position
+   - Adding integral action to eliminate steady-state error
+
+2. **Optimal Control Parameters**: Using optimization techniques to find optimal control parameters rather than manual tuning
+
+3. **Feedforward Terms**: Adding feedforward terms to compensate for known dynamics could improve performance
+
+4. **Reduced Control Effort**: Implementing constraints on control input to reduce excessive torques
+
+5. **Robust Control**: Developing a robust control strategy to handle parameter uncertainties and external disturbances
+
+### Comparative Analysis
+
+The full stabilization approach (energy-based + PD) clearly outperforms the energy-based only approach, as seen in the animations and plots. While the energy-based controller can bring the Acrobot close to the upright position, it cannot maintain stability there without the PD controller.
 
 <p align="center">
-  <img src="gfx/energy_based_only/plots.png" alt="full stablization of acrobot" width="800">
+  <img src="gfx/full_stabilization/plots.png" alt="full stabilization plots" width="800">
+  <br>
+  <em>Full stabilization controller performance</em>
 </p>
 
 <p align="center">
-  <img src="gfx/energy_based_only/acrobot.gif" alt="full stablization of acrobot" width="400">
-</p>
-<p align="center">
-  <em>Acrobot control using energy-based controller without PD control transition</em>
-</p>
-
-## Energy based controller with stabilization
-
-<p align="center">
-  <img src="gfx/full_stabilization/plots.png" alt="full stablization of acrobot" width="800">
+  <img src="gfx/energy_based_only/plots.png" alt="energy-based only plots" width="800">
+  <br>
+  <em>Energy-based only controller performance</em>
 </p>
 
-<p align="center">
-  <img src="gfx/full_stabilization/acrobot.gif" alt="full stablization of acrobot" width="400">
-</p>
-<p align="center">
-  <em>Full stabilization of the Acrobot system using an energy-based controller with PD control transition at the apex</em>
-</p>
+## 👨‍💻 Code Structure
 
-# Authors
+The implementation is contained in a single file (`acrobot.py`) with the following key components:
+
+* **Acrobot Class**: Defines the system dynamics and control methods
+* **Simulation Function**: Integrates the equations of motion using `solve_ivp`
+* **Visualization Functions**: Generates plots and animations
+* **Command-Line Interface**: Uses `tyro` for argument parsing
+
+## 🔍 Mathematical Details
+
+For a deeper understanding of the mathematical derivations, please refer to the [derivation document](derivation-doc.md), which includes:
+
+- Detailed derivation of the energy-based control law
+- Stability analysis using Lyapunov theory
+- Solvability conditions
+- Controller switching strategy
+
+## 🙏 Authors
 * [Egor Miroshnichenko](https://github.com/Chenkomirosh)
 * [Anton Bolychev](https://github.com/antonbolychev)
 * [Vladislav Sarmatin](https://github.com/VladSarm)
 * [Arsenii Shavrin](https://github.com/ArseniiSh)
 
-# References
-* [Sutton, R. S. (1996). Generalization in Reinforcement Learning: Successful Examples Using Sparse Coarse Coding. In D. Touretzky, M. C. Mozer, & M. Hasselmo (Eds.), Advances in Neural Information Processing Systems (Vol. 8). MIT Press.](https://proceedings.neurips.cc/paper/1995/file/8f1d43620bc6bb580df6e80b0dc05c48-Paper.pdf
-)
-* Xin, Xin & Kaneda, M.. (2007). Analysis of the energy‐based swing‐up control of the Acrobot. International Journal of Robust and Nonlinear Control. 17. 1503 - 1524. 10.1002/rnc.1184. 
-
+## 📚 References
+* [Sutton, R. S. (1996). Generalization in Reinforcement Learning: Successful Examples Using Sparse Coarse Coding.](https://proceedings.neurips.cc/paper/1995/file/8f1d43620bc6bb580df6e80b0dc05c48-Paper.pdf)
+* Xin, Xin & Kaneda, M. (2007). Analysis of the energy‐based swing‐up control of the Acrobot. International Journal of Robust and Nonlinear Control, 17, 1503-1524.
+* Spong, M. W. (1995). The swing up control problem for the acrobot. IEEE Control Systems Magazine, 15(1), 49-55.
