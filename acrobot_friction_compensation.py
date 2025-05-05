@@ -23,7 +23,7 @@ class Acrobot:
         I1=0.083,
         I2=0.33,
         g=9.8,
-        b2 = 1.2,
+        b2 = 1.5,
         is_energy_based_only=False,
     ):
         """Initialize Acrobot parameters"""
