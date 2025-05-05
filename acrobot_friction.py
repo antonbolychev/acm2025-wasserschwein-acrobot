@@ -376,7 +376,7 @@ class SimulationParams:
         if self.energy_based_only:
             self.output_dir = self.output_dir / "energy_based_only"
         else:
-            self.output_dir = self.output_dir / "with friction"
+            self.output_dir = self.output_dir / "with_friction"
 
         self.output_dir.mkdir(parents=True, exist_ok=True)
 
