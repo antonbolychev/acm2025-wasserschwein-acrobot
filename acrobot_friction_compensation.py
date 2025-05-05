@@ -23,7 +23,7 @@ class Acrobot:
         I1=0.083,
         I2=0.33,
         g=9.8,
-        b2 = -1.5,
+        b2 = 1.5,
         is_energy_based_only=False,
     ):
         """Initialize Acrobot parameters"""
@@ -89,7 +89,7 @@ class Acrobot:
     
     def Fr(self, dq2):
         """Friction terms (viscous friction model)"""
-        F2 = -self.b2 * dq2
+        F2 = self.b2 * dq2
         return np.array([0, F2])
 
     def energy_based_controller(self, t, state):
@@ -119,7 +119,7 @@ class Acrobot:
         denominator = self.kD * M11 + E_error * Delta
 
         # Compute control torque
-        tau2 = -numerator / denominator - self.b2*dq2
+        tau2 = -numerator / denominator + self.b2*dq2
 
         return tau2
 
