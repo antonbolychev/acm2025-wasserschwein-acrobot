@@ -23,6 +23,7 @@ class Acrobot:
         I1=0.083,
         I2=0.33,
         g=9.8,
+        b2 = -1.5,
         is_energy_based_only=False,
     ):
         """Initialize Acrobot parameters"""
@@ -35,6 +36,7 @@ class Acrobot:
         self.I1 = I1  # moment of inertia of link 1 (kg·m²)
         self.I2 = I2  # moment of inertia of link 2 (kg·m²)
         self.g = g  # gravity (m/s²)
+        self.b2 = b2 # friction coefficient in joint 2
 
         # Derived parameters (equation 5 in the paper)
         self.alpha1 = m1 * lc1**2 + m2 * l1**2 + I1
@@ -84,6 +86,11 @@ class Acrobot:
         kinetic = 0.5 * dq.T @ self.M(q2) @ dq
         potential = self.P(q1, q2)
         return kinetic + potential
+    
+    def Fr(self, dq2):
+        """Friction terms (viscous friction model)"""
+        F2 = -self.b2 * dq2
+        return np.array([0, F2])
 
     def energy_based_controller(self, t, state):
         """Energy-based controller (equation 18)"""
@@ -152,9 +159,10 @@ class Acrobot:
         # Compute Coriolis and gravity terms
         C_vec = self.C(q2, dq1, dq2)
         G_vec = self.G(q1, q2)
+        F_vec = self.Fr(dq2)
 
         # Compute accelerations
-        ddq = M_inv @ (tau - C_vec - G_vec)
+        ddq = M_inv @ (tau - C_vec - G_vec - F_vec)
 
         return [dq1, dq2, ddq[0], ddq[1]]
 
@@ -304,6 +312,7 @@ def animate_acrobot(t, y, t_span):
     time_text = ax.text(0.02, 0.95, "", transform=ax.transAxes)
     energy_text = ax.text(0.02, 0.90, "", transform=ax.transAxes)
     torque_text = ax.text(0.02, 0.85, "", transform=ax.transAxes)
+    friction_coeff_text = ax.text(0.02, 0.80, "", transform=ax.transAxes)
 
     # Calculate link positions
     acrobot = Acrobot()
@@ -318,7 +327,8 @@ def animate_acrobot(t, y, t_span):
         time_text.set_text("")
         energy_text.set_text("")
         torque_text.set_text("")
-        return link1, link2, time_text, energy_text, torque_text
+        friction_coeff_text.set_text("")
+        return link1, link2, time_text, energy_text, torque_text, friction_coeff_text
 
     def animate(i):
         # Link 1 (from base to first joint)
@@ -336,7 +346,11 @@ def animate_acrobot(t, y, t_span):
         tau2 = acrobot.controller(t[i], y[:, i])
         torque_text.set_text(f"Torque τ₂ = {tau2:.2f}N·m")
 
-        return link1, link2, time_text, energy_text, torque_text
+
+        # Show friction_coeff
+        friction_coeff_text.set_text(f"Friction coefficient = {acrobot.b2:.2f}")
+
+        return link1, link2, time_text, energy_text, torque_text, friction_coeff_text
 
     # Choose a reasonable frame rate
     step = max(1, len(t) // 200)
@@ -362,7 +376,7 @@ class SimulationParams:
         if self.energy_based_only:
             self.output_dir = self.output_dir / "energy_based_only"
         else:
-            self.output_dir = self.output_dir / "full_stabilization"
+            self.output_dir = self.output_dir / "with friction"
 
         self.output_dir.mkdir(parents=True, exist_ok=True)
 
