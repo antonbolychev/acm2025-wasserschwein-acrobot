@@ -263,13 +263,31 @@ The implemented controller demonstrates effective performance:
 3. **Effective Switching Strategy**: The transition between energy-based and PD controllers happens seamlessly
 4. **Adaptive term convergence**: The adaptive term convergence to stable number
 
+<p align="center">
+  <img src="gfx/adaptive_control/adaptive_only/plots.png" alt="adaptive only with friction and compensation plots" height="250" width="250">
+  <img src="gfx/adaptive_control/adaptive_only/acrobot.gif" alt="adaptive control with friction and compensation only" height="250" width="250">
+  <img src="gfx/adaptive_control/adaptive_only/friction_coeff.png" alt="adaptive control with friction and compensation only" height="250" width="250">
+</p>
+<p align="center">
+  <em>Acrobot using adaptive controller (without PD stabilization) with friction in second joint</em>
+</p>
+
+<p align="center">
+  <img src="gfx/adaptive_control/with_pd_controller/plots.png" alt="adaptive only with friction and compensation plots" height="250" width="250">
+  <img src="gfx/adaptive_control/with_pd_controller/acrobot.gif" alt="adaptive control with friction and compensation only" height="250" width="250">
+  <img src="gfx/adaptive_control/with_pd_controller/friction_coeff.png" alt="adaptive control with friction and compensation only" height="250" width="250">
+</p>
+<p align="center">
+  <em>Acrobot using adatptive controller (with PD stabilization) with friction in second joint</em>
+</p>
+
 ### Current Limitations
 
 The current implementation has several limitations:
 
 1. **Non-Stationary Balancing**: As shown in the animations, the controller does not achieve perfectly stationary balancing at the upright position. The system exhibits small oscillations around the equilibrium point.
 
-2. **Parameter Sensitivity**: The controller performance is sensitive to the tuning parameters ($k_D$, $k_P$, $k_V$) and may require re-tuning for different Acrobot parameters.
+2. **Parameter Sensitivity**: The controller performance is sensitive to the tuning parameters ($k_D$, $k_P$, $k_V$, $\gamma$) and may require re-tuning for different Acrobot parameters.
 
 ### Potential Improvements
 
