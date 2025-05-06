@@ -11,7 +11,7 @@ This repository implements an energy-based controller for the Acrobot, a classic
 
 ## 📋 Overview
 
-The Acrobot system consists of two links connected in a chain, with one end fixed. Only the joint between the two links is actuated. The challenge is to swing up the Acrobot from its initial downward hanging position to an upright balanced position using only the torque applied at the middle joint. In this scenario viscous friction in second joit also is indoducted.
+The Acrobot system consists of two links connected in a chain, with one end fixed. Only the joint between the two links is actuated. The challenge is to swing up the Acrobot from its initial downward hanging position to an upright balanced position using only the torque applied at the middle joint. In this scenario, viscous friction in the second joint is also introduced.
 
 **Control Strategy:**
 1. **Adaptive Control**: Initially swings up the Acrobot by regulating its total energy with adaptation term
@@ -67,12 +67,12 @@ b_2 \dot{q}_2
 ```
 
 Where:
-- $q = [q_1, q_2]^T$ , where $q_1, q_2$ represents joint angles and $\dot{q_1}, \dot{q_2}$ represent their angular velocities accordingly 
+- $q = [q_1, q_2]^T$ , where $q_1, q_2$ represents joint angles and $\dot{q}_1, \dot{q}_2$ represent their angular velocities accordingly 
 - $\tau = [0, \tau_2]^T$ represents torques (with $\tau_1 = 0$ since the first joint is unactuated, $\tau_2$ is a control action)
 - $M(q)$ is the inertia matrix
 - $C(q, \dot{q})$ contains Coriolis and centrifugal terms
 - $G(q)$ represents gravitational terms
-- $b_2$ is a viscous friction coeffitient in the second joint
+- $b_2$ is a viscous friction coefficient in the second joint
 
 #### Inertia Matrix $M(q)$
 The inertia matrix $M(q)$ represents the mass distribution of the robotic system as a function of its configuration $q$. It maps joint accelerations to the corresponding inertial forces and torques. For the Acrobot, it's a 2×2 symmetric, positive-definite matrix where each element $M_{ij}$ represents the coupling inertia between joints $i$ and $j$. When a joint accelerates, the inertia matrix determines how much torque is required at each joint to produce that acceleration.
@@ -125,7 +125,7 @@ The adaptive controller works by:
 - Calculating the total energy of the system
 - Comparing it to the target energy at the upright position
 - Integrating $\hat b_2$ equation
-- Applying torque to regulate the energy to the target value according to daptive term
+- Applying torque to regulate the energy to the target value according to adaptive term
 
 The Lyapunov function candidate used is:
 
@@ -137,7 +137,7 @@ Where:
 - $E$ is the current system energy
 - $E_r$ is the energy at the upright equilibrium
 - $k_D$, $k_P$ are positive constants
-- $\gamma$ is adaptation coeffitient
+- $\gamma$ is adaptation coefficient
 
 #### System Energy $E$
 The system energy $E$ represents the total mechanical energy of the Acrobot system, which is the sum of kinetic and potential energy. The kinetic energy accounts for the motion of both links, including rotational effects, while the potential energy relates to the height of the center of mass of each link in the gravitational field. This total energy is a key quantity in the energy-based control approach, as it provides a scalar measure that captures the overall state of the system.
@@ -228,16 +228,16 @@ We introduced viscous friction in the second joint with energy based control wit
   <img src="gfx/with_friction/acrobot.gif" alt="energy-based control with friction only" height="250" width="250">
 </p>
 <p align="center">
-  <em>Acrobot using only energy-based controller (wit PD stabilization) with friction in second joint</em>
+  <em>Acrobot using only energy-based controller (with PD stabilization) with friction in second joint</em>
 </p>
 
 As you can see on the image Acrobot cannot reach desired position.
 
-Friction coeffitient used in the experiments: $\gamma=1.5$.
+Friction coefficient used in the experiments: $\gamma=1.5$.
 
 ### Energy based control with viscous friction and compensation
 
-To check friction implementation using control law described above we can modify our control law:
+To validate the friction implementation using the control law described above, we can modify our control law:
 
 ```math
 \tau_2 = -\frac{(k_V \dot{q}_2 + k_P q_2)\Delta + k_D[M_{21}(H_1 + G_1) - M_{11}(H_2 + G_2)]}{k_D M_{11} + (E - E_r)\Delta} + b_2 \dot q_2
@@ -261,7 +261,7 @@ The implemented controller demonstrates effective performance:
 1. **Successful Swing-up**: The energy-based controller successfully swings the Acrobot from the downward position toward the upright position
 2. **Smooth Energy Regulation**: Energy gradually converges to the target value
 3. **Effective Switching Strategy**: The transition between energy-based and PD controllers happens seamlessly
-4. **Adaptive term convergence**: The adaptive term convergence to stable number
+4. **Adaptive term convergence**: The adaptive term convergence to a stable number
 
 <p align="center">
   <img src="gfx/adaptive_control/adaptive_only/plots.png" alt="adaptive only with friction and compensation plots" height="250" width="250">
@@ -278,7 +278,7 @@ The implemented controller demonstrates effective performance:
   <img src="gfx/adaptive_control/with_pd_controller/friction_coeff.png" alt="adaptive control with friction and compensation only" height="250" width="250">
 </p>
 <p align="center">
-  <em>Acrobot using adatptive controller (with PD stabilization) with friction in second joint</em>
+  <em>Acrobot using adaptive controller (with PD stabilization) with friction in second joint</em>
 </p>
 
 ### Current Limitations
@@ -319,7 +319,7 @@ The full stabilization approach (adaptive control + PD) clearly outperforms the 
   <img src="gfx/adaptive_control/with_pd_controller/friction_coeff.png" alt="adaptive control with friction and compensation only" height="250" width="250">
 </p>
 <p align="center">
-  <em>Acrobot using adatptive controller (with PD stabilization) with friction in second joint</em>
+  <em>Acrobot using adaptive controller (with PD stabilization) with friction in second joint</em>
 </p>
 
 ## 👨‍💻 Code Structure
