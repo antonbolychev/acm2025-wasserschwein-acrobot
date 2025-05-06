@@ -300,24 +300,26 @@ Several improvements could be made to enhance the controller performance:
 
 ### Comparative Analysis
 
-The full stabilization approach (energy-based + PD) clearly outperforms the energy-based only approach, as seen in the animations and plots. While the energy-based controller can bring the Acrobot close to the upright position, it cannot maintain stability there without the PD controller.
+The full stabilization approach (adaptive control + PD) clearly outperforms the adaptive control only approach, as seen in the animations and plots. While the adaptive controller can bring the Acrobot close to the upright position, it cannot maintain stability there without the PD controller.
 
-#### Energy-based controller only
+#### Adaptive controller only
 <p align="center">
-  <img src="gfx/energy_based_only/plots.png" alt="energy-based only plots" height="250">
-  <img src="gfx/energy_based_only/acrobot.gif" alt="energy-based control only" height="250">
+  <img src="gfx/adaptive_control/adaptive_only/plots.png" alt="adaptive only with friction and compensation plots" height="250" width="250">
+  <img src="gfx/adaptive_control/adaptive_only/acrobot.gif" alt="adaptive control with friction and compensation only" height="250" width="250">
+  <img src="gfx/adaptive_control/adaptive_only/friction_coeff.png" alt="adaptive control with friction and compensation only" height="250" width="250">
 </p>
 <p align="center">
-  <em>Acrobot using only energy-based controller (without PD stabilization)</em>
+  <em>Acrobot using adaptive controller (without PD stabilization) with friction in second joint</em>
 </p>
 
 #### Full stabilization
 <p align="center">
-  <img src="gfx/full_stabilization/plots.png" alt="full stabilization plots" height="250">
-  <img src="gfx/full_stabilization/acrobot.gif" alt="full stabilization of acrobot" height="250">
+  <img src="gfx/adaptive_control/with_pd_controller/plots.png" alt="adaptive only with friction and compensation plots" height="250" width="250">
+  <img src="gfx/adaptive_control/with_pd_controller/acrobot.gif" alt="adaptive control with friction and compensation only" height="250" width="250">
+  <img src="gfx/adaptive_control/with_pd_controller/friction_coeff.png" alt="adaptive control with friction and compensation only" height="250" width="250">
 </p>
 <p align="center">
-  <em>Full stabilization of the Acrobot system using an energy-based controller with PD control transition at the apex</em>
+  <em>Acrobot using adatptive controller (with PD stabilization) with friction in second joint</em>
 </p>
 
 ## 👨‍💻 Code Structure
