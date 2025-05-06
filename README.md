@@ -3,18 +3,18 @@
 This repository implements an energy-based controller for the Acrobot, a classic underactuated robotic system. The Acrobot consists of two links connected linearly, with only the second joint actuated, presenting a challenging control problem.
 
 <p align="center">
-  <img src="gfx/full_stabilization/acrobot.gif" alt="full stabilization of acrobot" width="400">
+  <img src="gfx/adaptive_control/with_pd_controller/acrobot.gif" alt="full stabilization of acrobot" width="400">
 </p>
 <p align="center">
-  <em>Full stabilization of the Acrobot system using an energy-based controller with PD control transition at the apex</em>
+  <em>Full stabilization of the Acrobot system using an adaptive controller with PD control transition at the apex</em>
 </p>
 
 ## 📋 Overview
 
-The Acrobot system consists of two links connected in a chain, with one end fixed. Only the joint between the two links is actuated. The challenge is to swing up the Acrobot from its initial downward hanging position to an upright balanced position using only the torque applied at the middle joint.
+The Acrobot system consists of two links connected in a chain, with one end fixed. Only the joint between the two links is actuated. The challenge is to swing up the Acrobot from its initial downward hanging position to an upright balanced position using only the torque applied at the middle joint. In this scenario viscous friction in second joit also is indoducted.
 
 **Control Strategy:**
-1. **Energy-Based Control**: Initially swings up the Acrobot by regulating its total energy
+1. **Adaptive Control**: Initially swings up the Acrobot by regulating its total energy with adaptation term
 2. **PD Control**: Takes over near the upright position for stabilization
 
 ## 🚀 Quick Start
@@ -35,12 +35,12 @@ To run the standard simulation with full stabilization:
 uv run acrobot.py
 ```
 
-The plots and animation will be saved to `gfx/full_stabilization/`.
+The plots and animation will be saved to `gfx/adaptive_control/`.
 
 To run the simulation with only the energy-based controller (without switching to PD control):
 
 ```bash
-uv run acrobot.py --energy-based-only
+uv run acrobot.py --adaptive-only
 ```
 
 This alternative simulation output will be saved to `gfx/energy_based_only/`.
@@ -59,7 +59,11 @@ This alternative simulation output will be saved to `gfx/energy_based_only/`.
 The motion equation of the Acrobot is:
 
 ```math
-M(q)\ddot{q} + C(q, \dot{q})\dot{q} + G(q) = \tau
+M(q)\ddot{q} + C(q, \dot{q})\dot{q} + G(q) + \begin{bmatrix}
+0 \\
+b_2 \dot{q}_2
+\end{bmatrix}
+ = \tau
 ```
 
 Where:
@@ -68,6 +72,7 @@ Where:
 - $M(q)$ is the inertia matrix
 - $C(q, \dot{q})$ contains Coriolis and centrifugal terms
 - $G(q)$ represents gravitational terms
+- $b_2$ is a viscous friction coeffitient in the second joint
 
 #### Inertia Matrix $M(q)$
 The inertia matrix $M(q)$ represents the mass distribution of the robotic system as a function of its configuration $q$. It maps joint accelerations to the corresponding inertial forces and torques. For the Acrobot, it's a 2×2 symmetric, positive-definite matrix where each element $M_{ij}$ represents the coupling inertia between joints $i$ and $j$. When a joint accelerates, the inertia matrix determines how much torque is required at each joint to produce that acceleration.
@@ -116,21 +121,23 @@ G_2
 
 #### 1. Energy-Based Swing-Up Control
 
-The energy-based controller works by:
+The adaptive controller works by:
 - Calculating the total energy of the system
 - Comparing it to the target energy at the upright position
-- Applying torque to regulate the energy to the target value
+- Integrating $\hat b_2$ equation
+- Applying torque to regulate the energy to the target value according to daptive term
 
 The Lyapunov function candidate used is:
 
 ```math
-V = \frac{1}{2} (E - E_r)^2 + \frac{1}{2} k_D \dot{q}_2^2 + \frac{1}{2} k_P q_2^2
+V = \frac{1}{2} (E - E_r)^2 + \frac{1}{2} k_D \dot{q}_2^2 + \frac{1}{2} k_P q_2^2 + \frac{(\hat b_2 - b_2)^2}{2\gamma}
 ```
 
 Where:
 - $E$ is the current system energy
 - $E_r$ is the energy at the upright equilibrium
 - $k_D$, $k_P$ are positive constants
+- $\gamma$ is adaptation coeffitient
 
 #### System Energy $E$
 The system energy $E$ represents the total mechanical energy of the Acrobot system, which is the sum of kinetic and potential energy. The kinetic energy accounts for the motion of both links, including rotational effects, while the potential energy relates to the height of the center of mass of each link in the gravitational field. This total energy is a key quantity in the energy-based control approach, as it provides a scalar measure that captures the overall state of the system.
@@ -153,33 +160,35 @@ The control law is derived using Lyapunov's direct method, which involves constr
 1. First, we define a Lyapunov function candidate:
 
 ```math
-V = \frac{1}{2} (E - E_r)^2 + \frac{1}{2} k_D \dot{q}_2^2 + \frac{1}{2} k_P q_2^2
+V = \frac{1}{2} (E - E_r)^2 + \frac{1}{2} k_D \dot{q}_2^2 + \frac{1}{2} k_P q_2^2 + \frac{(\hat b_2 - b_2)^2}{2\gamma}
 ```
 
 2. We differentiate this function with respect to time to get $\dot{V}$:
 
 ```math
-\dot{V} = (E - E_r)\dot{E} + k_D \dot{q}_2 \ddot{q}_2 + k_P q_2 \dot{q}_2
+\dot{V} = (E - E_r)\dot{E} + k_D \dot{q}_2 \ddot{q}_2 + k_P q_2 \dot{q}_2 + \frac{\dot{\hat b_2} - b_2}{\gamma} \dot{\hat{b_2}}
 ```
 
-3. Since $\dot{E} = \dot{q}^T \tau = \dot{q}_2 \tau_2$ (as $\tau_1 = 0$), we have:
+3. Since $\dot{E} = \dot{q}^T \tau = \dot{q}_2 \tau_2 - \hat b_2 \dot q_2^2$ (as $\tau_1 = 0$), we have:
 
 ```math
-\dot{V} = \dot{q}_2 \left( (E - E_r) \tau_2 + k_D \ddot{q}_2 + k_P q_2 \right)
+\dot{V} = \dot{q}_2 \left( (E - E_r) (\tau_2 - \hat{b_2}\dot{q_2}) + k_D \ddot{q}_2 + k_P q_2 \right) + (\hat b - b_2)(\dot{q_2^2}(E-E_r)+ \frac{\dot{\hat b}}{\gamma})
 ```
 
-4. To ensure $\dot{V} \leq 0$, we set:
+4. Let $\hat{\dot b} = -\gamma \dot q_2^2(E-E_r)$, then $\hat b(t) = \int_0^t{-\gamma \dot q_2^2(E-E_r)dt}$
+
+5. To ensure $\dot{V} \leq 0$, we set:
 
 ```math
-(E - E_r) \tau_2 + k_D \ddot{q}_2 + k_P q_2 = -k_V \dot{q}_2
+(E - E_r) (\tau_2 - \hat{b_2}\dot{q_2}) + k_D \ddot{q}_2 + k_P q_2 = -k_V \dot{q}_2
 ```
 
 Where $k_V > 0$ is a damping coefficient.
 
-5. Solving for $\tau_2$ using the system dynamics equations leads to the final control law:
+6. Solving for $\tau_2$ using the system dynamics equations leads to the final control law:
 
 ```math
-\tau_2 = -\frac{(k_V \dot{q}_2 + k_P q_2)\Delta + k_D[M_{21}(H_1 + G_1) - M_{11}(H_2 + G_2)]}{k_D M_{11} + (E - E_r)\Delta}
+\tau_2 = -\frac{(k_V \dot{q}_2 + k_P q_2)\Delta + k_D[M_{21}(H_1 + G_1) - M_{11}(H_2 + G_2 + \hat b_2\dot q_2)]}{k_D M_{11} + (E - E_r)\Delta}
 ```
 
 Where:
@@ -193,7 +202,7 @@ Where:
 - $E$ is the current system energy
 - $E_r$ is the target energy at the upright equilibrium
 
-For the complete mathematical derivation with all steps and proofs, see the [detailed derivation document](https://github.com/antonbolychev/acm2025-wasserschwein-acrobot/blob/master/README-derivation-energy-based.md).
+For the complete mathematical derivation with all steps and proofs, see the [detailed derivation document](https://github.com/antonbolychev/wasserschwein-acrobot/blob/adaptive_control/README-derivation-adaptive.md).
 
 
 #### 2. Linear PD Control for Stabilization
@@ -208,6 +217,41 @@ Where:
 - $x = [q_1 - \pi/2, q_2, \dot{q}_1, \dot{q}_2]^T$ is the state error vector
 - $F$ is the feedback gain matrix
 
+## 📊 Experiments Definition
+
+### Energy based control with viscous friction
+
+We introduced viscous friction in the second joint with energy based control without adaptation.
+
+<p align="center">
+  <img src="gfx/with_friction/plots.png" alt="energy-based only with friction plots" height="250" width="250">
+  <img src="gfx/with_friction/acrobot.gif" alt="energy-based control with friction only" height="250" width="250">
+</p>
+<p align="center">
+  <em>Acrobot using only energy-based controller (wit PD stabilization) with friction in second joint</em>
+</p>
+
+As you can see on the image Acrobot cannot reach desired position.
+
+Friction coeffitient used in the experiments: $\gamma=1.5$.
+
+### Energy based control with viscous friction and compensation
+
+To check friction implementation using control law described above we can modify our control law:
+
+```math
+\tau_2 = -\frac{(k_V \dot{q}_2 + k_P q_2)\Delta + k_D[M_{21}(H_1 + G_1) - M_{11}(H_2 + G_2)]}{k_D M_{11} + (E - E_r)\Delta} + b_2 \dot q_2
+```
+<p align="center">
+  <img src="gfx/with_friction_compenstation/plots.png" alt="energy-based only with friction and compensation plots" height="250" width="250">
+  <img src="gfx/with_friction_compenstation/acrobot.gif" alt="energy-based control with friction and compensation only" height="250" width="250">
+</p>
+<p align="center">
+  <em>Acrobot using energy-based controller (with PD stabilization) with friction in second joint and compensation in control law</em>
+</p>
+
+As you can see the plant behaviour is like without friction with energy based control.
+
 ## 📊 Results and Discussion
 
 ### What Works Well
@@ -217,6 +261,7 @@ The implemented controller demonstrates effective performance:
 1. **Successful Swing-up**: The energy-based controller successfully swings the Acrobot from the downward position toward the upright position
 2. **Smooth Energy Regulation**: Energy gradually converges to the target value
 3. **Effective Switching Strategy**: The transition between energy-based and PD controllers happens seamlessly
+4. **Adaptive term convergence**: The adaptive term convergence to stable number
 
 ### Current Limitations
 
@@ -269,9 +314,9 @@ The implementation is contained in a single file (`acrobot.py`) with the followi
 
 ## 🔍 Mathematical Details
 
-For a deeper understanding of the mathematical derivations, please refer to the [README-derivation-energy-based.md](https://github.com/antonbolychev/acm2025-wasserschwein-acrobot/blob/master/README-derivation-energy-based.md), which includes:
+For a deeper understanding of the mathematical derivations, please refer to the [README-derivation-energy-based.md](https://github.com/antonbolychev/wasserschwein-acrobot/blob/adaptive_control/README-derivation-adaptive.md), which includes:
 
-- Detailed derivation of the energy-based control law
+- Detailed derivation of the adaptive control law
 - Stability analysis using Lyapunov theory
 - Solvability conditions
 - Controller switching strategy
