@@ -146,7 +146,7 @@ class Acrobot:
     def controller(self, t, state):
         x = np.array([state[0] - np.pi / 2, state[1], state[2], state[3]])
         if self.is_energy_based_only or (
-            0.4 * np.abs(x[0]) + 0.4 * np.abs(x[1]) + 0.1 * np.abs(x[2]) + 0.1 * np.abs(x[3]) > 0.5
+            np.abs(x[0]) + np.abs(x[1]) + 0.1 * np.abs(x[2]) + 0.1 * np.abs(x[3]) > 0.06
             and not self.is_switched
         ):
             return self.adaptive_controller(t, state)
@@ -375,12 +375,12 @@ def animate_acrobot(t, y, t_span):
         return link1, link2, time_text, energy_text, torque_text, friction_coeff_text, b_hat_text
 
     # Choose a reasonable frame rate
-    step = max(1, len(t) // 200)
+    step = 1
     ani = FuncAnimation(
         fig,
         animate,
         frames=range(0, len(t), step),
-        interval=20,
+        interval=40,
         blit=True,
         init_func=init,
     )
@@ -403,14 +403,14 @@ def plot_friction_coeff(t, b2_list, b2_true,output_dir):
 
 @dataclass
 class SimulationParams:
-    energy_based_only: bool = False
+    energy_based_only: bool = True
     output_dir: Path = output_dir
 
     def __post_init__(self):
         if self.energy_based_only:
-            self.output_dir = self.output_dir / "energy_based_only"
+            self.output_dir = self.output_dir / "adaptive_only"
         else:
-            self.output_dir = self.output_dir / "with_friction"
+            self.output_dir = self.output_dir / "with_pd_controller"
 
         self.output_dir.mkdir(parents=True, exist_ok=True)
 
@@ -427,7 +427,7 @@ if __name__ == "__main__":
     initial_state = [-1.4, 0.0, 0.0, 0.0]  # [q1, q2, dq1, dq2]
 
     # Simulation time
-    t_span = [0, 30]  # 30 seconds
+    t_span = [0, 45]  # 30 seconds
 
     # Run simulation with energy-based controller
     t, y, tau2 = acrobot.simulate(t_span, initial_state)
@@ -441,5 +441,5 @@ if __name__ == "__main__":
     ani = animate_acrobot(t, y, t_span)
 
     # Save as GIF
-    ani.save(params.output_dir / "acrobot.gif", writer="pillow", fps=30)
+    ani.save(params.output_dir / "acrobot.gif", writer="pillow", fps=24)
     print("Animation saved as acrobot.gif")
