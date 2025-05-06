@@ -149,13 +149,13 @@ where $k_D$,$k_P$ and $\gamma$ are positive constants. This Lyapunov function ha
 Taking the time derivative of the Lyapunov function candidate along the system trajectory:
 
 ```math
-\dot{V} = (E - E_r)\dot{E} + k_D \dot{q}_2 \ddot{q}_2 + k_P q_2 \dot{q}_2
+\dot{V} = (E - E_r)\dot{E} + k_D \dot{q}_2 \ddot{q}_2 + k_P q_2 \dot{q}_2 + \frac{\dot{\hat b_2} - b_2}{\gamma} \dot{\hat{b_2}}
 ```
 
 Since $\dot{E} = \dot{q}^T \tau = \dot{q}_2 \tau_2 - b_2 \dot q^2_2$ (as $\tau_1 = 0$), we have:
 
 ```math
-\dot{V} = \dot{q}_2 \left( (E - E_r) (\tau_2 - \hat{b_2}\dot{q_2}) + k_D \ddot{q}_2 + k_P q_2 \right) + (\hat b - b_2)(\dot{q_2^2}(E-E_r)+ \frac{\hat{\dot b}}{\gamma})
+\dot{V} = \dot{q}_2 \left( (E - E_r) (\tau_2 - \hat{b_2}\dot{q_2}) + k_D \ddot{q}_2 + k_P q_2 \right) + (\hat b - b_2)(\dot{q_2^2}(E-E_r)+ \frac{\dot{\hat b}}{\gamma})
 ```
 
 To ensure $\dot{V} \leq 0$:
